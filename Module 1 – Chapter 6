@@ -1,0 +1,433 @@
+Module 1 – Chapter 6: Shift Left Testing, Shift Right Testing & DevSecOps
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is Shift Left Testing?
+What is Shift Right Testing?
+What is DevSecOps?
+Why security should be integrated into CI/CD
+Real Azure DevOps implementation
+Interview questions
+Why Were Shift Left & Shift Right Introduced?
+Traditional Software Development
+Requirements
+      │
+      ▼
+Development
+      │
+      ▼
+Testing
+      │
+      ▼
+Deployment
+      │
+      ▼
+Production
+
+Problems:
+
+Bugs found very late
+Security issues detected after deployment
+High cost to fix defects
+Delayed releases
+
+The solution was:
+
+Shift Left → Detect issues earlier.
+Shift Right → Continue validating after deployment.
+What is Shift Left Testing?
+Definition
+
+Shift Left means moving testing, quality, and security activities earlier in the Software Development Lifecycle (SDLC).
+
+Instead of waiting until the end, developers get feedback while writing and integrating code.
+
+Traditional vs Shift Left
+Traditional
+Code
+   │
+   ▼
+Build
+   │
+   ▼
+Testing
+   │
+   ▼
+Security Scan
+
+Security is checked late.
+
+Shift Left
+Developer
+     │
+     ▼
+Code
+     │
+     ▼
+Unit Tests
+     │
+     ▼
+Code Quality
+     │
+     ▼
+Security Scan
+     │
+     ▼
+Build
+
+Problems are caught much earlier.
+
+Shift Left Activities
+Static Code Analysis (SAST)
+Unit Testing
+Code Reviews
+Secret Scanning
+Dependency Scanning
+Container Image Scanning
+Infrastructure as Code (IaC) Validation
+Azure DevOps Example
+
+Developer pushes code.
+
+Pipeline automatically:
+
+Git Push
+     │
+     ▼
+GitHub Actions
+     │
+     ▼
+Unit Tests
+     │
+     ▼
+SonarQube (Code Quality)
+     │
+     ▼
+Secret Scan
+     │
+     ▼
+Trivy (Image Scan)
+     │
+     ▼
+Terraform Validate
+     │
+     ▼
+Build Docker Image
+
+If any step fails, the pipeline stops.
+
+Benefits of Shift Left
+Early bug detection
+Lower cost to fix issues
+Better code quality
+Improved security
+Faster delivery
+What is Shift Right Testing?
+Definition
+
+Shift Right means testing, monitoring, and validating the application after it has been deployed.
+
+The goal is to understand how the application behaves in real production environments.
+
+Shift Right Workflow
+Deploy
+     │
+     ▼
+Users
+     │
+     ▼
+Monitoring
+     │
+     ▼
+Logs
+     │
+     ▼
+Alerts
+     │
+     ▼
+Feedback
+Shift Right Activities
+Monitoring
+Logging
+Performance Testing
+Synthetic Monitoring
+Chaos Engineering
+Canary Testing
+Blue-Green Validation
+User Experience Monitoring
+Azure Example
+
+After deployment:
+
+Azure Monitor checks:
+
+CPU
+Memory
+Disk
+Availability
+Response Time
+
+Application Insights tracks:
+
+Failed requests
+Dependencies
+Exceptions
+User requests
+
+If an issue is detected:
+
+Alert sent
+Incident created
+Rollback if needed
+Shift Left vs Shift Right
+Feature	Shift Left	Shift Right
+When?	Before deployment	After deployment
+Focus	Prevent defects	Detect runtime issues
+Goal	Improve quality early	Improve production reliability
+Common Tools	SonarQube, Trivy, Checkov, Terraform Validate	Azure Monitor, Application Insights, Grafana, Prometheus
+What is DevSecOps?
+Definition
+
+DevSecOps integrates security into every phase of the DevOps lifecycle, instead of treating security as a final step.
+
+Security becomes everyone's responsibility.
+
+Traditional Security
+Develop
+     │
+     ▼
+Build
+     │
+     ▼
+Deploy
+     │
+     ▼
+Security Team
+
+Security comes last.
+
+DevSecOps
+Plan
+ │
+ ▼
+Secure Coding
+ │
+ ▼
+Build
+ │
+ ▼
+Security Scan
+ │
+ ▼
+Deploy
+ │
+ ▼
+Monitor
+ │
+ ▼
+Continuous Security
+
+Security is continuous.
+
+DevSecOps Lifecycle
+Plan
+ │
+ ▼
+Code
+ │
+ ▼
+SAST
+ │
+ ▼
+Build
+ │
+ ▼
+Dependency Scan
+ │
+ ▼
+Container Scan
+ │
+ ▼
+Deploy
+ │
+ ▼
+DAST
+ │
+ ▼
+Monitor
+Types of Security Testing
+1. SAST (Static Application Security Testing)
+
+Scans source code without running the application.
+
+Examples:
+
+SonarQube
+CodeQL
+Semgrep
+
+Finds:
+
+SQL Injection risks
+Hardcoded secrets
+Weak coding patterns
+2. DAST (Dynamic Application Security Testing)
+
+Scans a running application.
+
+Examples:
+
+OWASP ZAP
+Burp Suite
+
+Finds:
+
+Authentication flaws
+Session issues
+Runtime vulnerabilities
+3. Dependency Scanning
+
+Checks third-party libraries for known vulnerabilities.
+
+Examples:
+
+Dependabot
+Snyk
+Trivy
+4. Container Scanning
+
+Scans Docker images before deployment.
+
+Examples:
+
+Trivy
+Microsoft Defender
+Clair
+5. IaC Scanning
+
+Scans infrastructure code for security misconfigurations.
+
+Examples:
+
+Checkov
+tfsec
+Terrascan
+
+Checks:
+
+Open security groups
+Public storage accounts
+Weak IAM/RBAC permissions
+Enterprise Azure DevOps Pipeline
+Developer
+      │
+      ▼
+GitHub
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+Unit Tests
+      │
+      ▼
+SonarQube (SAST)
+      │
+      ▼
+Dependency Scan
+      │
+      ▼
+Terraform Validate
+      │
+      ▼
+Checkov (IaC Scan)
+      │
+      ▼
+Docker Build
+      │
+      ▼
+Trivy (Container Scan)
+      │
+      ▼
+Push to Azure Container Registry
+      │
+      ▼
+Deploy to AKS
+      │
+      ▼
+Azure Monitor
+      │
+      ▼
+Application Insights
+      │
+      ▼
+Alerts
+
+This is a DevSecOps pipeline because security checks are integrated throughout the lifecycle.
+
+Azure Services Used
+Purpose	Azure Service / Tool
+Source Control	GitHub / Azure Repos
+CI/CD	GitHub Actions / Azure Pipelines
+Secrets	Azure Key Vault
+Identity	Managed Identity
+Container Registry	Azure Container Registry
+Runtime	AKS
+Monitoring	Azure Monitor
+Observability	Application Insights
+Security	Microsoft Defender for Cloud
+Compliance	Azure Policy
+Real-World Scenario
+
+A developer accidentally commits an Azure Storage Account access key to GitHub.
+
+Without DevSecOps:
+
+The secret reaches production.
+Attackers may gain unauthorized access.
+
+With DevSecOps:
+
+Secret scanning detects the exposed key during the pipeline.
+The build fails immediately.
+The secret is rotated.
+The code is corrected before deployment.
+
+This prevents a security incident before it reaches production.
+
+Interview Questions
+1. What is Shift Left Testing?
+
+Answer: Shift Left Testing moves testing and security activities earlier in the SDLC to detect defects as soon as possible.
+
+2. What is Shift Right Testing?
+
+Answer: Shift Right Testing focuses on monitoring and validating applications after deployment using production telemetry and user feedback.
+
+3. What is DevSecOps?
+
+Answer: DevSecOps integrates security into every stage of the DevOps lifecycle, making security a shared responsibility across development, operations, and security teams.
+
+4. What is the difference between SAST and DAST?
+SAST	DAST
+Tests source code	Tests a running application
+Performed before deployment	Performed after deployment or in a test environment
+Finds coding flaws	Finds runtime vulnerabilities
+5. Which tools have you used for DevSecOps?
+
+A strong answer based on your project:
+
+"In our pipeline, we use SonarQube for static code analysis, Trivy for container image scanning, Terraform validation for IaC checks, Azure Key Vault for secret management, Azure Container Registry for storing images, AKS for deployment, and Azure Monitor with Application Insights for post-deployment monitoring."
+
+Key Takeaways
+Shift Left = Detect defects and security issues before deployment.
+Shift Right = Monitor and validate the application after deployment.
+DevSecOps = Integrate security into every phase of the DevOps lifecycle.
+Modern Azure DevOps pipelines combine Shift Left, Shift Right, and DevSecOps to deliver secure, reliable software.
+Assignment
+Explain the difference between Shift Left and Shift Right.
+List three activities performed during Shift Left.
+What is the difference between SAST and DAST?
+Where would you place SonarQube, Trivy, and Azure Monitor in a CI/CD pipeline?
+Why is Azure Key Vault important in a DevSecOps pipeline?

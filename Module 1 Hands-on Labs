@@ -1,0 +1,186 @@
+Lab 1: Create a GitHub Repository
+
+Objective: Learn source control basics.
+
+Tasks:
+
+Create a GitHub repository.
+Clone it locally.
+Create a README.md.
+Commit and push the changes.
+Create a feature branch.
+Merge it using a Pull Request.
+
+Skills: Git, branching, PR workflow.
+
+Lab 2: Install Azure CLI
+
+Tasks:
+
+az login
+az account show
+az group list
+
+Skills: Azure CLI basics.
+
+Lab 3: Install Docker
+
+Tasks:
+
+docker --version
+docker run hello-world
+docker ps
+docker images
+
+Skills: Docker installation and verification.
+
+Lab 4: Install kubectl
+
+Tasks:
+
+kubectl version --client
+kubectl config view
+
+Skills: Kubernetes CLI basics.
+
+Lab 5: Build Your First CI Pipeline
+
+Create a simple GitHub Actions workflow:
+
+name: First CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Print Message
+        run: echo "Hello Azure DevOps"
+
+Push it to GitHub and verify the workflow succeeds.
+
+Skills: CI fundamentals.
+
+Lab 6: Introduce a Build Failure
+
+Modify the workflow:
+
+- name: Fail Build
+  run: exit 1
+
+Observe:
+
+Pipeline failure
+Logs
+Error messages
+
+Skills: Troubleshooting pipelines.
+
+Lab 7: Add a Manual Approval Environment
+
+In GitHub:
+
+Create an environment named Production.
+Configure required reviewers.
+Update the workflow to deploy to that environment.
+
+This demonstrates Continuous Delivery.
+
+Lab 8: Add Security Scanning
+
+Integrate:
+
+SonarQube (or SonarCloud)
+Trivy
+
+Pipeline flow:
+
+Code
+ ↓
+Build
+ ↓
+Unit Test
+ ↓
+SonarQube
+ ↓
+Trivy
+ ↓
+Docker Image
+
+Skills: Shift Left and DevSecOps.
+
+Lab 9: Monitoring Concepts
+
+Create:
+
+Azure Monitor workspace
+Log Analytics Workspace
+
+Explore:
+
+Metrics
+Activity Logs
+Alerts
+
+No application deployment yet—just become familiar with the monitoring services.
+
+Mini Project (End of Module 1)
+
+Build a simple CI pipeline:
+
+GitHub
+   │
+   ▼
+GitHub Actions
+   │
+   ▼
+Build
+   │
+   ▼
+Unit Test
+   │
+   ▼
+Docker Build
+   │
+   ▼
+Trivy Scan
+   │
+   ▼
+Success
+
+This combines the key concepts from Module 1:
+
+CI
+Shift Left
+DevSecOps
+Automation
+My Recommendation
+
+Since your goal is enterprise-level Azure DevOps, I suggest we make this course 100% practical.
+
+For every chapter, we'll follow this structure:
+
+Theory (20–30 minutes)
+Hands-on Lab (30–60 minutes)
+Enterprise Scenario
+Interview Questions
+Assignment
+
+By the end of the course, you'll have built:
+
+An enterprise Azure infrastructure
+Production-grade GitHub Actions pipelines
+Terraform modules
+AKS clusters
+Helm deployments
+Argo CD GitOps
+Azure Monitor integration
+Security with SonarQube, Trivy, and Key Vault
+Blue-Green and Canary deployments

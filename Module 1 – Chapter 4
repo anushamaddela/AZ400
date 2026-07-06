@@ -1,0 +1,276 @@
+Module 1 – Chapter 4: Agile vs DevOps
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is Agile?
+What is DevOps?
+Differences between Agile and DevOps
+How Agile and DevOps work together
+Real-world examples
+Interview questions
+What is Agile?
+
+Agile is a software development methodology that focuses on delivering software in small, incremental releases through collaboration, customer feedback, and iterative development.
+
+Agile Goals
+Deliver software faster
+Adapt to changing requirements
+Improve customer satisfaction
+Deliver working software frequently
+Agile Lifecycle
+Requirements
+      │
+      ▼
+Sprint Planning
+      │
+      ▼
+Development
+      │
+      ▼
+Testing
+      │
+      ▼
+Sprint Review
+      │
+      ▼
+Release
+
+Typically, Agile teams work in 1–4 week sprints.
+
+Agile Roles
+Role	Responsibility
+Product Owner	Defines and prioritizes business requirements
+Scrum Master	Facilitates Agile processes and removes blockers
+Development Team	Designs, develops, and tests the software
+What is DevOps?
+
+DevOps extends Agile by automating the build, test, deployment, monitoring, and operations processes after development.
+
+Plan
+ ↓
+Code
+ ↓
+Build
+ ↓
+Test
+ ↓
+Release
+ ↓
+Deploy
+ ↓
+Operate
+ ↓
+Monitor
+
+Agile helps teams build the right software.
+
+DevOps helps teams deliver and operate that software efficiently.
+
+Simple Analogy
+
+Imagine building a house.
+
+Agile
+
+The architect and builders work together to design and construct the house in phases.
+
+DevOps
+
+Once the house is built, utilities, security systems, maintenance, monitoring, and ongoing support are put in place.
+
+Agile focuses on creating.
+
+DevOps focuses on delivering and maintaining.
+
+Agile vs DevOps
+Feature	Agile	DevOps
+Primary Goal	Develop software quickly	Deliver and operate software continuously
+Focus	Development	Development + Operations
+Team	Developers, QA, Product Owner	Developers, QA, Operations, Security
+Release Frequency	End of Sprint	Anytime (Continuous Delivery/Deployment)
+Automation	Limited	Extensive
+Monitoring	Minimal	Continuous
+Feedback	Customer feedback	Customer + System monitoring
+Scope	Software development	End-to-end software lifecycle
+Agile and DevOps Together
+Customer Requirement
+        │
+        ▼
+Product Owner
+        │
+        ▼
+Sprint Planning
+        │
+        ▼
+Development
+        │
+        ▼
+Testing
+        │
+        ▼
+GitHub
+        │
+        ▼
+GitHub Actions
+        │
+        ▼
+Build
+        │
+        ▼
+SonarQube
+        │
+        ▼
+Trivy
+        │
+        ▼
+Azure Container Registry
+        │
+        ▼
+AKS
+        │
+        ▼
+Azure Monitor
+        │
+        ▼
+Feedback
+        │
+        └──────────► Next Sprint
+
+This is how Agile and DevOps complement each other.
+
+Real-World Example
+
+Suppose a banking app needs a new feature: UPI QR Payments.
+
+Agile
+Product Owner creates a user story.
+Team plans it in Sprint Planning.
+Developers implement it.
+QA tests it.
+Sprint review is conducted.
+DevOps
+Developer pushes code to GitHub.
+GitHub Actions builds the application.
+SonarQube checks code quality.
+Trivy scans for vulnerabilities.
+Docker image is pushed to ACR.
+Helm deploys it to AKS.
+Azure Monitor tracks performance.
+Alerts are generated if issues occur.
+
+Agile delivers the feature.
+
+DevOps ensures the feature reaches users safely and reliably.
+
+Sprint vs Release
+
+This is another common interview topic.
+
+Sprint	Release
+Time-boxed development cycle	Software made available to users
+Usually 1–4 weeks	Can happen anytime
+Managed by Agile	Managed through DevOps/Release Management
+
+A sprint does not always end with a production release. Multiple sprints may be combined into a single release, or continuous delivery may allow releases after every completed feature.
+
+Common Tools
+Agile
+Azure Boards
+Jira
+Trello
+DevOps
+GitHub
+Azure DevOps
+GitHub Actions
+Azure Pipelines
+Jenkins
+Docker
+Kubernetes
+Terraform
+Helm
+Argo CD
+Azure Monitor
+Agile + DevOps in Azure
+Activity	Azure Service
+User Stories	Azure Boards
+Source Control	Azure Repos / GitHub
+CI/CD	Azure Pipelines / GitHub Actions
+Infrastructure	Terraform / Bicep
+Deployment	AKS
+Monitoring	Azure Monitor
+Interview Questions
+1. What is the difference between Agile and DevOps?
+
+Answer:
+Agile is a development methodology focused on iterative software development and customer feedback. DevOps extends Agile by automating the build, test, deployment, operations, and monitoring processes to enable continuous delivery.
+
+2. Can an organization use Agile without DevOps?
+
+Answer:
+Yes. A team can develop software using Agile practices without adopting DevOps. However, deployments may remain manual and slower.
+
+3. Can an organization use DevOps without Agile?
+
+Answer:
+Yes, but it's less common. DevOps can automate delivery processes even if the development team doesn't follow Agile. Many organizations combine Agile and DevOps for better outcomes.
+
+4. Which comes first: Agile or DevOps?
+
+Answer:
+Typically, Agile comes first because it governs how software is planned and developed. DevOps complements Agile by automating delivery and operations after development.
+
+5. Does Agile replace DevOps?
+
+Answer:
+No. They solve different problems and work together. Agile focuses on building software effectively, while DevOps focuses on delivering and operating it efficiently.
+
+Azure DevOps Engineer Perspective
+
+As an Azure DevOps Engineer, your responsibilities usually begin after developers push code:
+
+Developer Pushes Code
+        │
+        ▼
+GitHub
+        │
+        ▼
+GitHub Actions
+        │
+        ▼
+Terraform
+        │
+        ▼
+Docker
+        │
+        ▼
+Azure Container Registry
+        │
+        ▼
+AKS
+        │
+        ▼
+Helm
+        │
+        ▼
+Argo CD
+        │
+        ▼
+Azure Monitor
+
+This is the area where DevOps engineers add the most value.
+
+Key Takeaways
+Agile focuses on planning, developing, and iterating on software.
+DevOps focuses on automating delivery, deployment, operations, and monitoring.
+Agile and DevOps complement each other rather than compete.
+In modern organizations, Agile + DevOps together enable faster, more reliable software delivery.
+Assignment
+
+Answer these questions:
+
+What is the primary goal of Agile?
+What is the primary goal of DevOps?
+How do Agile and DevOps complement each other?
+What is the difference between a Sprint and a Release?
+In your current Azure project, identify which activities belong to Agile and which belong to DevOps.

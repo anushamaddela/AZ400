@@ -1,0 +1,198 @@
+Module 1 – Chapter 1: What is DevOps?
+Learning Objectives
+
+By the end of this chapter, you should be able to answer:
+
+What is DevOps?
+Why was DevOps introduced?
+What problems does it solve?
+What are its benefits?
+How is software delivered before and after DevOps?
+What is DevOps?
+
+DevOps is a culture, a set of practices, and a collection of tools that bring Development (Dev) and Operations (Ops) teams together to deliver software faster, more reliably, and with higher quality through automation and collaboration.
+
+Interview Definition (2 lines):
+
+DevOps is a culture that combines development and operations to automate the software delivery lifecycle, enabling faster, reliable, and continuous delivery of applications.
+
+Why was DevOps Introduced?
+Before DevOps
+
+Development and Operations worked independently.
+
+Developer
+     │
+     │  "Code is complete."
+     ▼
+Operations
+     │
+     │  "It doesn't work in Production."
+     ▼
+Production Delay
+Common Problems
+Slow deployments
+Manual deployments
+Human errors
+Environment differences
+Poor communication
+Long release cycles
+Frequent production failures
+
+Example:
+
+Developer builds on Windows.
+Production runs on Linux.
+The application fails because of OS differences or missing dependencies.
+Traditional Software Delivery
+Requirement
+      ↓
+Development
+      ↓
+Testing
+      ↓
+Operations
+      ↓
+Production
+
+Each team worked separately, causing delays.
+
+DevOps Workflow
+Plan
+   ↓
+Code
+   ↓
+Build
+   ↓
+Test
+   ↓
+Release
+   ↓
+Deploy
+   ↓
+Operate
+   ↓
+Monitor
+   ↺
+Feedback
+
+This continuous cycle enables faster improvement and releases.
+
+Goals of DevOps
+Faster software delivery
+Better collaboration
+Automation
+Improved quality
+Continuous feedback
+Stable production environments
+Faster recovery from failures
+Key Principles
+Collaboration between teams
+Automation of repetitive tasks
+Continuous Integration (CI)
+Continuous Delivery/Deployment (CD)
+Monitoring and feedback
+Security integrated into the lifecycle (DevSecOps)
+Real-World Example
+Without DevOps
+
+A company releases a banking application.
+
+Developers finish coding in January.
+Testing completes in February.
+Operations deploy in March.
+Deployment fails due to missing configurations.
+Release is delayed.
+
+Total time: 3 months
+
+With DevOps
+Developers push code to GitHub.
+CI pipeline builds and tests automatically.
+Docker image is created.
+Image is scanned for vulnerabilities.
+Image is pushed to Azure Container Registry (ACR).
+Deployment to AKS happens automatically.
+Monitoring starts immediately.
+Alerts are generated if issues occur.
+
+Release time: 15–30 minutes (depending on the application)
+
+Benefits of DevOps
+Benefit	Description
+Faster Releases	Deliver software more frequently
+Automation	Reduce manual effort
+High Quality	Automated testing catches issues early
+Reliability	Consistent deployments
+Scalability	Easy to scale infrastructure
+Security	Security integrated into the pipeline
+Cost Reduction	Fewer failures and less rework
+Azure DevOps Example
+
+Suppose you push code to GitHub.
+
+GitHub
+   ↓
+GitHub Actions
+   ↓
+Terraform
+   ↓
+Azure
+   ↓
+AKS
+   ↓
+Helm
+   ↓
+Argo CD
+   ↓
+Production
+   ↓
+Azure Monitor
+
+This is a modern DevOps workflow and closely matches what you've been building in your enterprise project.
+
+Common DevOps Tools
+Stage	Popular Tools
+Planning	Azure Boards, Jira
+Source Control	Git, GitHub, Azure Repos
+Build	GitHub Actions, Azure Pipelines, Jenkins
+Testing	JUnit, Selenium, pytest
+Code Quality	SonarQube
+Security	Trivy, Microsoft Defender
+Containers	Docker
+Orchestration	Kubernetes, AKS
+GitOps	Argo CD, Flux
+Infrastructure	Terraform, Bicep, ARM
+Monitoring	Azure Monitor, Prometheus, Grafana
+Interview Questions
+1. What is DevOps?
+
+Answer: DevOps is a culture and set of practices that combine development and operations to automate software delivery, improve collaboration, and enable continuous integration and continuous delivery.
+
+2. Why do organizations adopt DevOps?
+
+Answer: To reduce release time, improve software quality, automate deployments, increase reliability, and enhance collaboration between teams.
+
+3. Is DevOps only a tool?
+
+Answer: No. DevOps is primarily a culture supported by processes and tools. Tools enable automation, but culture drives collaboration and continuous improvement.
+
+4. Name some commonly used DevOps tools.
+
+Answer: Git, GitHub, Azure DevOps, GitHub Actions, Jenkins, Docker, Kubernetes, Terraform, Helm, Argo CD, SonarQube, Trivy, Azure Monitor.
+
+Key Takeaways
+DevOps is not just a tool—it's a culture, process, and automation approach.
+It reduces manual work through automation.
+CI/CD is a core practice within DevOps.
+Collaboration between development and operations is essential.
+Continuous monitoring and feedback improve software quality over time.
+Assignment
+
+Try to answer these in your own words:
+
+What is DevOps?
+Why was DevOps introduced?
+What problems did traditional software delivery face?
+List the main benefits of DevOps.
+Explain the DevOps lifecycle from Plan to Monitor.

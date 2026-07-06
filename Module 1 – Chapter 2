@@ -1,0 +1,347 @@
+Module 1 – Chapter 2: DevOps Lifecycle
+Learning Objectives
+
+By the end of this chapter, you will understand:
+
+What is the DevOps Lifecycle?
+Why each phase is important
+Activities in every stage
+Common tools used
+Real-world Azure DevOps example
+Interview questions
+What is the DevOps Lifecycle?
+
+The DevOps Lifecycle is a continuous process used to develop, test, deploy, operate, and improve software through automation and continuous feedback.
+
+Unlike the traditional waterfall model, it is a continuous loop, enabling frequent releases and ongoing improvement.
+
+          ┌──────────────┐
+          │     Plan     │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │     Code     │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │    Build     │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │     Test     │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │   Release    │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │    Deploy    │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │   Operate    │
+          └──────┬───────┘
+                 │
+                 ▼
+          ┌──────────────┐
+          │   Monitor    │
+          └──────┬───────┘
+                 │
+          Feedback Loop
+                 │
+                 └────────────► Plan
+Phase 1: Plan
+Purpose
+
+Gather business requirements and define what needs to be built.
+
+Activities
+Collect requirements
+Create user stories
+Sprint planning
+Task estimation
+Prioritize backlog
+Common Tools
+Azure Boards
+Jira
+Trello
+Example
+
+A customer requests:
+
+"Users should be able to log in using Google."
+
+The Product Owner creates a user story, and the team plans it for the next sprint.
+
+Phase 2: Code
+Purpose
+
+Developers write application code.
+
+Activities
+Write code
+Commit changes
+Create branches
+Raise Pull Requests
+Code reviews
+Common Tools
+Git
+GitHub
+Azure Repos
+Example
+
+Developer creates:
+
+feature/google-login
+
+After implementation:
+
+git add .
+git commit -m "Added Google Login"
+git push
+Phase 3: Build
+Purpose
+
+Convert source code into a deployable artifact.
+
+Activities
+Compile code
+Restore dependencies
+Build Docker images
+Package application
+Common Tools
+GitHub Actions
+Azure Pipelines
+Jenkins
+Maven
+Gradle
+npm
+Example
+
+GitHub Actions automatically:
+
+Installs dependencies
+Builds the application
+Creates a Docker image
+Phase 4: Test
+Purpose
+
+Ensure the application works correctly.
+
+Types of Testing
+Unit Testing
+Integration Testing
+Functional Testing
+Performance Testing
+Security Testing
+Common Tools
+JUnit
+pytest
+Selenium
+SonarQube
+Trivy
+Example
+
+Pipeline automatically runs:
+
+Unit tests
+SonarQube analysis
+Trivy vulnerability scan
+
+If tests fail, deployment stops.
+
+Phase 5: Release
+Purpose
+
+Prepare the application for deployment.
+
+Activities
+Versioning
+Approvals
+Artifact storage
+Release notes
+Common Tools
+GitHub Releases
+Azure Pipelines
+Azure Artifacts
+Example
+
+Release version:
+
+v2.5.0
+
+Artifact stored in:
+
+Azure Container Registry (ACR)
+Azure Artifacts
+Phase 6: Deploy
+Purpose
+
+Deploy the application to an environment.
+
+Environments
+Development
+QA
+UAT
+Production
+Deployment Strategies
+Rolling
+Blue-Green
+Canary
+Common Tools
+Helm
+Argo CD
+AKS
+Azure Pipelines
+Example
+GitHub
+      ↓
+GitHub Actions
+      ↓
+Docker Image
+      ↓
+Azure Container Registry
+      ↓
+Helm
+      ↓
+AKS
+Phase 7: Operate
+Purpose
+
+Run and maintain the application in production.
+
+Activities
+Scaling
+Backups
+Patch management
+Incident response
+Disaster recovery
+Common Azure Services
+AKS
+Azure Virtual Machines
+Azure Backup
+Azure Site Recovery
+Example
+
+If traffic increases:
+
+2 Pods
+ ↓
+10 Pods
+
+Kubernetes scales automatically using the Horizontal Pod Autoscaler (HPA).
+
+Phase 8: Monitor
+Purpose
+
+Observe application health and performance.
+
+Activities
+CPU monitoring
+Memory monitoring
+Log collection
+Alerting
+Performance analysis
+Common Tools
+Azure Monitor
+Application Insights
+Log Analytics
+Prometheus
+Grafana
+Example
+
+An alert triggers when:
+
+CPU usage exceeds 80%
+Response time exceeds 2 seconds
+Error rate rises above a defined threshold
+
+The operations team investigates and resolves the issue.
+
+End-to-End Azure DevOps Flow
+Developer
+      │
+      ▼
+GitHub Repository
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+Build Docker Image
+      │
+      ▼
+SonarQube Scan
+      │
+      ▼
+Trivy Scan
+      │
+      ▼
+Push to Azure Container Registry
+      │
+      ▼
+Helm Deployment
+      │
+      ▼
+AKS
+      │
+      ▼
+Azure Monitor
+      │
+      ▼
+Alerts & Logs
+
+This closely matches the enterprise pipeline you're building.
+
+Lifecycle Summary
+Phase	Goal	Example Tool
+Plan	Requirements	Azure Boards
+Code	Develop features	GitHub
+Build	Create artifacts	GitHub Actions
+Test	Verify quality	SonarQube, Trivy
+Release	Prepare versions	Azure Artifacts
+Deploy	Deliver application	AKS, Helm
+Operate	Run production	AKS
+Monitor	Observe health	Azure Monitor
+Real Interview Scenario
+
+Question: A developer pushes code to GitHub. Explain what happens until it's available to users.
+
+Sample Answer:
+
+The developer pushes code to GitHub.
+A CI pipeline starts automatically.
+The application is built.
+Unit tests run.
+SonarQube performs code quality checks.
+Trivy scans the Docker image for vulnerabilities.
+The image is pushed to Azure Container Registry.
+Helm deploys the application to AKS.
+Azure Monitor and Application Insights track the application's health.
+If issues are detected, alerts are sent and feedback is used to improve the next release.
+Interview Questions
+What is the DevOps Lifecycle?
+Why is the lifecycle continuous?
+What is the difference between Build and Release?
+Why is monitoring important in DevOps?
+Which Azure services are commonly used in each lifecycle stage?
+Explain the DevOps lifecycle using a real project example.
+Key Takeaways
+The DevOps lifecycle is a continuous feedback loop, not a one-time sequence.
+Each phase feeds into the next and is heavily automated.
+Monitoring provides insights that influence future planning.
+A successful DevOps implementation relies on automation, collaboration, and continuous improvement across all stages.
+Quick Check
+
+Can you briefly explain:
+
+The purpose of the Build phase.
+The difference between Release and Deploy.
+Which stage uses Azure Monitor and why?
