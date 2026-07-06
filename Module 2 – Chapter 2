@@ -1,0 +1,308 @@
+Module 2 – Chapter 2: Azure Virtual Networks (VNet), Address Spaces & Subnets
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is a VNet?
+What is an Address Space?
+What is a Subnet?
+Public vs Private networking
+IP addressing basics
+Azure reserved IPs
+Enterprise network design
+Hands-on lab
+Real-World Analogy
+
+Imagine a company building.
+
+Company Building
+│
+├── HR Department
+├── Finance Department
+├── IT Department
+└── Admin Department
+
+The building is your Virtual Network (VNet).
+
+Each department is a Subnet.
+
+Employees in the same building can communicate securely.
+
+What is an Azure Virtual Network (VNet)?
+
+A Virtual Network (VNet) is a logically isolated private network in Azure that enables Azure resources to communicate securely.
+
+Think of it as your private data center network in the cloud.
+
+Resources inside a VNet can communicate with each other using private IP addresses.
+
+Examples:
+
+Virtual Machines
+AKS
+Azure Bastion
+Private Endpoints
+Load Balancers
+VNet Architecture
+Azure Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Virtual Network (10.0.0.0/16)
+        │
+ ┌──────┼─────────────┐
+ │      │             │
+ ▼      ▼             ▼
+Web    App          Database
+Subnet Subnet       Subnet
+Why Do We Need a VNet?
+
+Without a VNet:
+
+Resources communicate over public internet.
+Less secure.
+
+With a VNet:
+
+Private communication.
+Network isolation.
+Better security.
+Easier access control.
+What is an Address Space?
+
+An Address Space defines the range of private IP addresses available inside a VNet.
+
+Example:
+
+10.0.0.0/16
+
+This means the VNet can allocate IPs from:
+
+10.0.0.1
+...
+10.0.255.254
+CIDR Notation
+
+Azure uses CIDR (Classless Inter-Domain Routing).
+
+Examples:
+
+CIDR	Approx. Number of IPs
+/24	256
+/23	512
+/22	1024
+/21	2048
+/20	4096
+/16	65,536
+
+Interview Tip: You don't need to memorize every value. Understand that a smaller prefix (e.g., /16) provides more IP addresses than a larger prefix (e.g., /24).
+
+What is a Subnet?
+
+A Subnet divides a VNet into smaller logical networks.
+
+Example:
+
+VNet
+10.0.0.0/16
+
+Split into:
+
+Web Subnet
+10.0.1.0/24
+
+App Subnet
+10.0.2.0/24
+
+DB Subnet
+10.0.3.0/24
+
+Each subnet has its own IP range.
+
+Why Use Subnets?
+
+Benefits:
+
+Security isolation
+Better traffic management
+Easier NSG application
+Supports different application tiers
+Reduces broadcast domains
+Three-Tier Architecture
+
+This is one of the most common enterprise designs.
+
+                Internet
+                    │
+                    ▼
+          Application Gateway
+                    │
+                    ▼
+            Web Subnet
+           10.0.1.0/24
+                    │
+                    ▼
+            App Subnet
+           10.0.2.0/24
+                    │
+                    ▼
+         Database Subnet
+           10.0.3.0/24
+Enterprise Azure Network
+
+A typical production network:
+
+VNet
+10.0.0.0/16
+
+├── AzureBastionSubnet
+│      10.0.0.0/26
+│
+├── WebSubnet
+│      10.0.1.0/24
+│
+├── AppSubnet
+│      10.0.2.0/24
+│
+├── AKSSubnet
+│      10.0.3.0/22
+│
+├── DatabaseSubnet
+│      10.0.8.0/24
+│
+└── PrivateEndpointSubnet
+       10.0.9.0/24
+Azure Reserved IP Addresses
+
+Azure reserves the first four IP addresses and the last IP address in every subnet.
+
+Example:
+
+Subnet
+10.0.1.0/24
+
+Reserved:
+
+10.0.1.0
+10.0.1.1
+10.0.1.2
+10.0.1.3
+10.0.1.255
+
+Usable IPs:
+
+10.0.1.4
+...
+10.0.1.254
+
+This is a common interview question.
+
+Public vs Private IP
+Public IP	Private IP
+Internet accessible	Internal only
+Assigned to gateways, load balancers, public VMs	Assigned inside a VNet
+Globally routable	Not routable over the public internet
+Hands-on Lab 1: Create a VNet
+Azure Portal
+
+Create:
+
+Setting	Value
+Resource Group	rg-az400-dev
+Name	vnet-az400-dev
+Address Space	10.0.0.0/16
+Azure CLI
+az network vnet create \
+  --resource-group rg-az400-dev \
+  --name vnet-az400-dev \
+  --address-prefix 10.0.0.0/16
+
+Verify:
+
+az network vnet list --output table
+Hands-on Lab 2: Create Subnets
+
+Create:
+
+Subnet	CIDR
+Web	10.0.1.0/24
+App	10.0.2.0/24
+DB	10.0.3.0/24
+
+CLI:
+
+az network vnet subnet create \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --name web-subnet \
+  --address-prefixes 10.0.1.0/24
+
+Repeat for:
+
+app-subnet
+10.0.2.0/24
+db-subnet
+10.0.3.0/24
+
+Verify:
+
+az network vnet subnet list \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --output table
+Hands-on Lab 3: Visualize the Network
+
+Your environment should look like this:
+
+rg-az400-dev
+│
+└── vnet-az400-dev
+      │
+      ├── web-subnet
+      ├── app-subnet
+      └── db-subnet
+Best Practices
+Use non-overlapping CIDR ranges.
+Plan for future growth.
+Separate application tiers into different subnets.
+Reserve dedicated subnets for:
+AKS
+Azure Bastion
+Application Gateway
+Private Endpoints
+Avoid placing everything in a single subnet.
+Interview Questions
+1. What is a VNet?
+
+A VNet is a logically isolated private network in Azure that enables secure communication between Azure resources.
+
+2. What is the difference between a VNet and a Subnet?
+VNet	Subnet
+Entire private network	A logical segment within a VNet
+Contains one or more subnets	Belongs to one VNet
+3. Why do we use subnets?
+Security isolation
+Better traffic management
+Apply NSGs to specific workloads
+Organize resources by function
+4. How many IP addresses does Azure reserve in each subnet?
+
+Answer: Azure reserves 5 IP addresses in every subnet:
+
+First 4 IP addresses
+Last IP address
+5. Can resources in different subnets communicate?
+
+Answer: Yes. By default, subnets within the same VNet can communicate unless restricted by Network Security Groups (NSGs), route tables, or other network controls.
+
+Assignment
+Create vnet-az400-dev with the address space 10.0.0.0/16.
+Create three subnets:
+web-subnet
+app-subnet
+db-subnet
+List the subnets using Azure CLI.
+Explain why Azure reserves five IP addresses in each subnet.
+Draw your VNet architecture on paper or using a diagramming tool to reinforce the concepts.
