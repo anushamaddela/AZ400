@@ -1,0 +1,353 @@
+Module 2 – Chapter 4: Route Tables, User Defined Routes (UDRs), Service Endpoints & Private Endpoints
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+How Azure routes traffic
+What is a Route Table?
+What is a User Defined Route (UDR)?
+What are Service Endpoints?
+What are Private Endpoints?
+Differences between Service Endpoints and Private Endpoints
+Enterprise networking scenarios
+Hands-on labs
+How Does Azure Route Traffic?
+
+Suppose you have:
+
+VM
+ │
+ ▼
+Storage Account
+
+How does Azure know where to send packets?
+
+It uses routing.
+
+Every subnet has a route table (system routes by default).
+
+What is a Route?
+
+A route tells Azure:
+
+"If traffic is destined for this network, send it to this next hop."
+
+Every route contains:
+
+Property	Example
+Address Prefix	10.0.0.0/16
+Next Hop Type	Virtual Network
+Next Hop IP	(optional)
+Azure Default Routes
+
+Azure automatically creates system routes.
+
+Destination	Next Hop
+VNet	Virtual Network
+Internet	Internet
+Local Subnets	Virtual Network
+
+Example:
+
+VM
+ │
+ ▼
+Internet
+
+Azure already knows how to route it.
+What is a Route Table?
+
+A Route Table is a collection of routes that can be associated with one or more subnets.
+
+Route Table
+│
+├── Route 1
+├── Route 2
+└── Route 3
+Why Use Route Tables?
+
+You use them when you want Azure to override the default routing behavior.
+
+Examples:
+
+Send all internet traffic through Azure Firewall.
+Force traffic through a Network Virtual Appliance (NVA).
+Create hub-and-spoke architectures.
+What is a User Defined Route (UDR)?
+
+A User Defined Route (UDR) is a custom route that overrides Azure's default system routes.
+
+Example:
+
+Without UDR:
+
+VM
+ │
+ ▼
+Internet
+
+With UDR:
+
+VM
+ │
+ ▼
+Azure Firewall
+ │
+ ▼
+Internet
+
+All traffic is inspected before leaving the VNet.
+
+UDR Components
+Property	Example
+Address Prefix	0.0.0.0/0
+Next Hop Type	Virtual Appliance
+Next Hop IP	10.0.10.4
+Enterprise Example
+Web VM
+     │
+     ▼
+Azure Firewall
+     │
+     ▼
+Internet
+
+The UDR forces all outbound traffic through the firewall for inspection and logging.
+
+Hands-on Lab 1: Create a Route Table
+Azure Portal
+
+Create:
+
+Setting	Value
+Name	rt-web-dev
+Resource Group	rg-az400-dev
+Region	Central India
+Azure CLI
+az network route-table create \
+  --resource-group rg-az400-dev \
+  --name rt-web-dev
+
+Verify:
+
+az network route-table list --output table
+Hands-on Lab 2: Create a User Defined Route
+
+Example route:
+
+Destination:
+0.0.0.0/0
+
+Next Hop:
+Internet
+
+CLI:
+
+az network route-table route create \
+  --resource-group rg-az400-dev \
+  --route-table-name rt-web-dev \
+  --name DefaultRoute \
+  --address-prefix 0.0.0.0/0 \
+  --next-hop-type Internet
+
+In real production environments, this next hop is often Azure Firewall or a Virtual Appliance, not the Internet.
+
+Hands-on Lab 3: Associate Route Table
+
+Associate it with web-subnet:
+
+az network vnet subnet update \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --name web-subnet \
+  --route-table rt-web-dev
+What are Service Endpoints?
+
+Imagine:
+
+VM
+ │
+ ▼
+Storage Account
+
+Normally:
+
+VM
+ │
+ ▼
+Public Internet
+ │
+ ▼
+Storage
+
+Even though traffic stays on Microsoft's backbone, the storage account still has a public endpoint.
+
+Service Endpoint
+VM
+ │
+ ▼
+Azure Backbone
+ │
+ ▼
+Storage
+
+The subnet is authorized to access the Azure service directly.
+
+Supported services include:
+
+Storage
+SQL Database
+Key Vault
+Cosmos DB
+Benefits
+Improved security
+Simpler configuration
+No VPN required
+Lower latency
+Hands-on Lab 4: Enable Service Endpoint
+
+Portal:
+
+Open web-subnet
+Service Endpoints
+Enable:
+Microsoft.Storage
+
+CLI:
+
+az network vnet subnet update \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --name web-subnet \
+  --service-endpoints Microsoft.Storage
+What is a Private Endpoint?
+
+A Private Endpoint gives an Azure service a private IP address inside your VNet.
+
+Instead of reaching the service through a public endpoint, your resources connect to it privately.
+
+Without Private Endpoint
+VM
+ │
+ ▼
+Public Endpoint
+ │
+ ▼
+Storage
+With Private Endpoint
+VM
+ │
+ ▼
+Private IP
+ │
+ ▼
+Storage
+
+The storage account can even have public network access disabled.
+
+Enterprise Example
+AKS
+ │
+ ▼
+Private Endpoint
+ │
+ ▼
+Azure Key Vault
+
+Secrets are accessed entirely over the private Azure network.
+
+Benefits
+No public exposure
+Private IP access
+Higher security
+Supports regulatory compliance
+Service Endpoint vs Private Endpoint
+Feature	Service Endpoint	Private Endpoint
+Public IP still exists	✅ Yes	❌ No (can disable public access)
+Uses Private IP	❌ No	✅ Yes
+Works over Azure backbone	✅ Yes	✅ Yes
+Highest Security	Good	Best
+DNS Changes Required	No	Usually Yes (Private DNS Zone)
+Which Should You Choose?
+
+Use Service Endpoints when:
+
+Simplicity is sufficient.
+Public endpoints are acceptable with subnet restrictions.
+
+Use Private Endpoints when:
+
+Accessing sensitive services (Key Vault, SQL Database, Storage).
+Public access must be disabled.
+Compliance or strict security requirements exist.
+Enterprise Architecture
+Internet
+     │
+     ▼
+Application Gateway
+     │
+     ▼
+Web Subnet
+     │
+     ▼
+App Subnet
+     │
+     ▼
+AKS
+     │
+     ▼
+Private Endpoint
+     │
+     ▼
+Azure Key Vault
+
+Storage Account
+      ▲
+      │
+Private Endpoint
+
+This is a common enterprise design for secure workloads.
+
+Interview Questions
+1. What is a Route Table?
+
+A Route Table is a collection of routing rules that determine how traffic leaves a subnet.
+
+2. What is a User Defined Route?
+
+A User Defined Route is a custom route that overrides Azure's default routing behavior.
+
+3. What is the difference between a Service Endpoint and a Private Endpoint?
+
+Answer:
+
+Service Endpoint: Secures access from a VNet to an Azure service, but the service still has a public endpoint.
+Private Endpoint: Assigns a private IP from your VNet to the Azure service, allowing private access and enabling you to disable public access.
+4. When would you use a Private Endpoint?
+
+For services such as:
+
+Azure Key Vault
+Azure SQL Database
+Azure Storage
+Azure Cosmos DB
+
+where private connectivity and reduced exposure are required.
+
+5. What is the purpose of a UDR?
+
+To control network traffic by directing it to a specific next hop, such as an Azure Firewall or Network Virtual Appliance.
+
+Assignment
+Create a Route Table named rt-web-dev.
+Associate it with web-subnet.
+Enable a Microsoft.Storage Service Endpoint on web-subnet.
+Create a Storage Account and explore the Networking settings.
+Compare the configuration options for Service Endpoints and Private Endpoints in the Azure portal.
+Key Takeaways
+Route Tables define how traffic is routed.
+UDRs override Azure's default routing when custom traffic paths are required.
+Service Endpoints provide secure access to Azure services while those services retain public endpoints.
+Private Endpoints provide private IP-based access and are the preferred option for highly secure enterprise deployments.
+In enterprise environments, Private Endpoints are commonly used with services like Azure Key Vault, Storage Accounts, and Azure SQL.
+Next Chapter

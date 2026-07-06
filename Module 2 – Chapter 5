@@ -1,0 +1,407 @@
+Module 2 – Chapter 5: Public IP, NAT Gateway, Azure Load Balancer, Application Gateway & Azure Firewall
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is a Public IP?
+What is a NAT Gateway?
+What is Azure Load Balancer?
+What is Azure Application Gateway?
+What is Azure Firewall?
+When to use each service
+Enterprise architecture
+Hands-on labs
+Chapter Overview
+
+Let's first understand how internet traffic reaches an application.
+
+                    Internet
+                        │
+                        ▼
+                  Public IP
+                        │
+                        ▼
+              Application Gateway
+                        │
+                        ▼
+                 Azure Load Balancer
+                        │
+         ┌──────────────┴──────────────┐
+         ▼                             ▼
+      VM/AKS Pod 1                 VM/AKS Pod 2
+
+For outbound internet access:
+
+VM/AKS
+    │
+    ▼
+NAT Gateway
+    │
+    ▼
+Internet
+1. Public IP Address
+What is a Public IP?
+
+A Public IP allows Azure resources to communicate with the internet.
+
+Examples:
+
+Virtual Machine
+Application Gateway
+Azure Firewall
+Azure Load Balancer
+Without Public IP
+Internet
+    │
+    ✖
+VM
+
+Internet cannot reach the VM.
+
+With Public IP
+Internet
+    │
+    ▼
+Public IP
+    │
+    ▼
+VM
+
+The VM is reachable (assuming NSGs allow the traffic).
+
+Types of Public IP
+Type	Description
+Static	IP address remains the same
+Dynamic	IP address may change when the resource is recreated or deallocated
+Interview Tip
+
+For production services, Static Public IPs are typically preferred to avoid changing DNS records.
+
+Hands-on Lab 1: Create a Public IP
+
+Portal:
+
+Create a Public IP:
+
+Name: pip-web-dev
+SKU: Standard
+Assignment: Static
+
+CLI:
+
+az network public-ip create \
+  --resource-group rg-az400-dev \
+  --name pip-web-dev \
+  --sku Standard \
+  --allocation-method Static
+
+Verify:
+
+az network public-ip list --output table
+2. NAT Gateway
+Why NAT Gateway?
+
+Suppose your VM needs to:
+
+Download updates
+Access GitHub
+Pull Docker images
+Connect to Azure services
+
+Without NAT:
+
+Every VM would require its own Public IP.
+
+That's expensive and increases the attack surface.
+
+With NAT Gateway
+VM1
+VM2
+VM3
+ │
+ ▼
+NAT Gateway
+ │
+ ▼
+Internet
+
+Many resources share one outbound public IP.
+
+Benefits
+One public IP for many resources
+Predictable outbound IP
+Improved scalability
+Reduced public exposure
+Enterprise Example
+
+AKS Nodes
+
+AKS Node Pool
+        │
+        ▼
+NAT Gateway
+        │
+        ▼
+Docker Hub
+
+Every node shares the same outbound IP.
+
+Hands-on Lab 2: Create NAT Gateway
+
+Prerequisites:
+
+Public IP
+NAT Gateway
+
+CLI:
+
+az network nat gateway create \
+  --resource-group rg-az400-dev \
+  --name nat-dev \
+  --public-ip-addresses pip-web-dev
+
+Associate it with your subnet:
+
+az network vnet subnet update \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --name web-subnet \
+  --nat-gateway nat-dev
+3. Azure Load Balancer
+What is a Load Balancer?
+
+A Load Balancer distributes traffic across multiple backend servers.
+
+Without it:
+
+Internet
+ │
+ ▼
+Server 1
+
+If Server 1 fails, the application becomes unavailable.
+
+With Load Balancer
+Internet
+    │
+    ▼
+Load Balancer
+    │
+ ┌──┴──┐
+ ▼     ▼
+VM1   VM2
+
+Traffic is distributed based on the configured load-balancing rules.
+
+Types
+Type	Use Case
+Public Load Balancer	Internet-facing applications
+Internal Load Balancer	Private/internal applications
+Layer
+
+Azure Load Balancer works at Layer 4 (TCP/UDP).
+
+It does not inspect HTTP requests.
+
+Hands-on Lab 3
+
+Create:
+
+Standard Load Balancer
+Backend Pool
+Health Probe
+Load Balancing Rule
+
+(We'll use it in later modules with AKS and VMs.)
+
+4. Azure Application Gateway
+What is Application Gateway?
+
+An Application Gateway is a Layer 7 (HTTP/HTTPS) load balancer.
+
+It understands:
+
+URLs
+Hostnames
+Cookies
+HTTP Headers
+Example
+Internet
+      │
+      ▼
+Application Gateway
+      │
+ ┌────┴────┐
+ ▼         ▼
+API       Website
+URL-Based Routing
+example.com/api
+        │
+        ▼
+API Server
+
+example.com/shop
+        │
+        ▼
+Shop Server
+Features
+SSL Termination
+URL Routing
+Cookie-based Session Affinity
+Web Application Firewall (WAF)
+HTTP → HTTPS Redirection
+Enterprise Example
+Internet
+      │
+      ▼
+Application Gateway (WAF)
+      │
+      ▼
+AKS Ingress
+      │
+      ▼
+Pods
+
+This is a common production architecture for AKS.
+
+Hands-on Lab 4
+
+Create:
+
+Application Gateway
+Public IP
+Listener
+Backend Pool
+Routing Rule
+
+(We'll configure it fully in the AKS module.)
+
+5. Azure Firewall
+What is Azure Firewall?
+
+Azure Firewall is a managed, stateful network security service.
+
+Unlike an NSG, it can inspect and control traffic centrally across multiple VNets.
+
+Example
+Internet
+      │
+      ▼
+Azure Firewall
+      │
+      ▼
+Virtual Network
+Features
+Network Rules
+Application Rules
+FQDN Filtering
+Threat Intelligence
+Logging
+DNAT/SNAT
+High Availability
+NSG vs Azure Firewall
+NSG	Azure Firewall
+Subnet/NIC level	Network-wide
+Layer 3 & 4	Layer 3–7 capabilities
+Simple traffic filtering	Advanced centralized filtering
+No FQDN filtering	Supports FQDN filtering
+No threat intelligence	Threat intelligence support
+Enterprise Architecture
+                     Internet
+                         │
+                         ▼
+                 Azure Firewall
+                         │
+                         ▼
+               Application Gateway
+                         │
+                         ▼
+                    AKS Cluster
+                         │
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+      Frontend Pods                Backend Pods
+                         │
+                         ▼
+                 Private Endpoint
+                         │
+                         ▼
+                    Azure SQL
+
+This is a very common enterprise architecture.
+
+Which Service Should You Use?
+Requirement	Azure Service
+Inbound internet access	Public IP
+Outbound internet access	NAT Gateway
+TCP/UDP load balancing	Azure Load Balancer
+HTTP/HTTPS routing	Application Gateway
+Centralized firewall	Azure Firewall
+Interview Questions
+1. What is the difference between a Load Balancer and an Application Gateway?
+Load Balancer	Application Gateway
+Layer 4	Layer 7
+TCP/UDP	HTTP/HTTPS
+Doesn't inspect URLs	Supports URL-based routing, SSL termination, WAF
+2. Why use a NAT Gateway?
+
+To provide secure, scalable, and predictable outbound internet connectivity for resources in a subnet without assigning a Public IP to each resource.
+
+3. Can a VM access the internet without a Public IP?
+
+Yes. A VM can use:
+
+NAT Gateway
+Azure Firewall
+Other outbound mechanisms
+
+without having its own Public IP.
+
+4. When would you use Azure Firewall instead of an NSG?
+
+Use Azure Firewall when you need:
+
+Centralized traffic control
+Application-aware filtering
+Threat intelligence
+Logging across multiple VNets
+
+NSGs are suitable for subnet- or NIC-level traffic filtering.
+
+5. What is SSL Termination?
+
+SSL Termination is the process where the Application Gateway decrypts incoming HTTPS traffic, reducing the SSL processing load on backend servers.
+
+Hands-on Assignment
+
+Create the following:
+
+pip-web-dev (Static Public IP)
+nat-dev
+Associate the NAT Gateway with web-subnet
+Create a Standard Load Balancer
+Create an Application Gateway
+Explore the Azure Firewall creation wizard (no need to deploy yet, as it incurs cost)
+Azure DevOps Interview Scenario
+
+Question:
+
+Your AKS cluster must not expose node public IPs, but it needs internet access to pull Docker images from Azure Container Registry and external repositories. How would you design it?
+
+Sample Answer:
+
+Deploy AKS into a private subnet.
+Associate a NAT Gateway with the AKS subnet for outbound internet access.
+Expose the application through an Application Gateway (or an ingress controller behind it).
+Use NSGs to restrict traffic.
+Use Private Endpoints for services such as Azure Key Vault and Storage when appropriate.
+
+This demonstrates a secure and scalable architecture.
+
+Key Takeaways
+Public IP enables inbound or outbound internet connectivity.
+NAT Gateway provides outbound internet access without assigning Public IPs to individual resources.
+Azure Load Balancer distributes TCP/UDP traffic (Layer 4).
+Application Gateway provides HTTP/HTTPS routing and advanced web features (Layer 7).
+Azure Firewall offers centralized, enterprise-grade network security.
+Next Chapter

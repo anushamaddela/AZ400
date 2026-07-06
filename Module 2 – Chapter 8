@@ -1,0 +1,498 @@
+Module 2 – Chapter 8: Azure Key Vault (Secrets, Keys & Certificates)
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is Azure Key Vault?
+Secrets vs Keys vs Certificates
+Key Vault Architecture
+Access Control
+RBAC vs Access Policies
+Managed Identity with Key Vault
+GitHub Actions with Key Vault
+AKS with Key Vault
+Enterprise Architecture
+Hands-on Labs
+Why Do We Need Key Vault?
+
+Imagine your application needs:
+
+Database Username
+Database Password
+API Key
+Storage Access Key
+SSL Certificate
+
+Where should you store them?
+
+❌ Bad options:
+
+config.yaml
+
+application.properties
+
+terraform.tfvars
+
+GitHub Repository
+
+Dockerfile
+
+These files can be exposed accidentally.
+
+Correct Solution
+Application
+      │
+      ▼
+Azure Key Vault
+
+The application requests secrets securely at runtime.
+
+What is Azure Key Vault?
+
+Azure Key Vault is a managed service for securely storing and controlling access to sensitive information.
+
+It stores:
+
+Secrets
+Encryption Keys
+Certificates
+Key Vault Architecture
+Application
+      │
+Managed Identity
+      │
+      ▼
+Azure Key Vault
+      │
+ ┌────┼─────┐
+ ▼    ▼     ▼
+Secrets Keys Certificates
+Three Types of Objects
+1. Secrets
+
+Secrets are values like:
+
+Database Password
+
+API Token
+
+Connection String
+
+Storage Key
+
+JWT Secret
+
+Example:
+
+Name:
+db-password
+
+Value:
+P@ssw0rd123
+2. Keys
+
+Keys are used for encryption.
+
+Examples:
+
+Encrypt data
+Decrypt data
+Sign JWT tokens
+Verify signatures
+
+Usually used by applications and security services.
+
+3. Certificates
+
+Stores SSL/TLS certificates.
+
+Examples:
+
+www.contoso.com
+
+Instead of storing certificates on VMs, applications retrieve them securely from Key Vault.
+
+Enterprise Architecture
+GitHub Actions
+       │
+       ▼
+Azure
+       │
+       ▼
+AKS
+       │
+Managed Identity
+       │
+       ▼
+Azure Key Vault
+       │
+       ▼
+Database Password
+
+No passwords are stored in GitHub or Kubernetes manifests.
+
+Creating a Key Vault
+
+Portal
+
+Create:
+
+Setting	Value
+Name	kv-az400-dev
+Resource Group	rg-az400-dev
+Region	Central India
+Azure CLI
+az keyvault create \
+  --name kv-az400-dev \
+  --resource-group rg-az400-dev \
+  --location centralindia
+
+Verify:
+
+az keyvault list --output table
+Hands-on Lab 1
+
+Create:
+
+kv-az400-dev
+Hands-on Lab 2
+
+Create a Secret.
+
+Portal:
+
+Key Vault
+
+↓
+
+Secrets
+
+↓
+
+Generate/Import
+
+Create:
+
+Name:
+db-password
+
+Value:
+MySecurePassword123
+Azure CLI
+az keyvault secret set \
+  --vault-name kv-az400-dev \
+  --name db-password \
+  --value "MySecurePassword123"
+
+View it:
+
+az keyvault secret show \
+  --vault-name kv-az400-dev \
+  --name db-password
+Access Control
+
+How do applications access Key Vault?
+
+There are two models.
+
+1. Azure RBAC (Recommended)
+Application
+      │
+Managed Identity
+      │
+RBAC
+      │
+Azure Key Vault
+
+Roles include:
+
+Key Vault Administrator
+Key Vault Secrets User
+Key Vault Reader
+Key Vault Certificates Officer
+2. Access Policies (Legacy)
+
+Older method.
+
+Key Vault
+      │
+Access Policies
+      │
+User
+
+Microsoft now recommends Azure RBAC for new deployments.
+
+Managed Identity + Key Vault
+
+Suppose:
+
+AKS needs:
+
+Database Password
+
+Instead of:
+
+password: MyPassword
+
+inside Kubernetes,
+
+use:
+
+AKS
+ │
+Managed Identity
+ │
+Azure Key Vault
+
+Application reads the secret securely.
+
+GitHub Actions + Key Vault
+
+Traditional approach:
+
+GitHub Secret
+
+contains:
+
+Database Password
+
+Modern approach:
+
+GitHub Actions
+      │
+OIDC
+      │
+Azure
+      │
+Key Vault
+
+GitHub retrieves the secret at runtime.
+
+Key Vault Network Security
+
+Key Vault supports:
+
+Firewall
+Private Endpoint
+Virtual Network Rules
+Public Access Disabled
+
+Enterprise design:
+
+AKS
+ │
+ ▼
+Private Endpoint
+ │
+ ▼
+Key Vault
+
+No internet exposure.
+
+Soft Delete
+
+Suppose someone deletes:
+
+db-password
+
+Without Soft Delete:
+
+❌ Permanently lost.
+
+With Soft Delete:
+
+Deleted Secret
+
+↓
+
+Recover
+
+Recovery is possible within the retention period.
+
+Purge Protection
+
+Even administrators cannot permanently delete protected secrets until the configured retention period expires.
+
+This is useful for compliance.
+
+Enterprise Security Best Practices
+
+✅ Use Managed Identity
+
+✅ Enable Soft Delete
+
+✅ Enable Purge Protection
+
+✅ Use RBAC
+
+✅ Disable Public Network Access (where appropriate)
+
+✅ Use Private Endpoints
+
+✅ Rotate Secrets
+
+Enterprise Example
+AKS
+ │
+ ▼
+Managed Identity
+ │
+ ▼
+Private Endpoint
+ │
+ ▼
+Azure Key Vault
+ │
+ ├── SQL Password
+ ├── Storage Key
+ ├── API Token
+ └── TLS Certificate
+Hands-on Lab 3
+
+Enable Soft Delete.
+
+Open:
+
+Key Vault
+
+↓
+
+Properties
+
+Verify:
+
+Soft Delete = Enabled
+Purge Protection = Enabled (if appropriate for your environment)
+Hands-on Lab 4
+
+Assign RBAC.
+
+Go to:
+
+Key Vault
+
+↓
+
+Access Control (IAM)
+
+↓
+
+Add Role
+
+Assign:
+
+Key Vault Secrets User
+
+to a Managed Identity or test user.
+
+Hands-on Lab 5
+
+Retrieve a Secret
+
+CLI:
+
+az keyvault secret show \
+  --vault-name kv-az400-dev \
+  --name db-password
+Azure DevOps Example
+
+GitHub Actions
+
+- Login to Azure
+
+↓
+
+- Read Secret
+
+↓
+
+- Deploy AKS
+
+Instead of storing:
+
+password:
+
+inside GitHub.
+
+Interview Questions
+1. What is Azure Key Vault?
+
+Azure Key Vault is a managed Azure service used to securely store and manage secrets, encryption keys, and certificates.
+
+2. What is the difference between Secrets, Keys, and Certificates?
+Object	Purpose
+Secret	Passwords, API keys, connection strings
+Key	Encryption and cryptographic operations
+Certificate	SSL/TLS certificates
+3. Why is Key Vault preferred?
+
+Because:
+
+Secure storage
+Centralized management
+RBAC integration
+Automatic auditing
+Secret rotation
+Managed Identity support
+4. How does AKS access Key Vault?
+
+Using:
+
+Managed Identity (or Azure AD Workload Identity)
+RBAC permissions
+Key Vault integration
+
+No passwords are stored inside Kubernetes manifests.
+
+5. How do GitHub Actions securely access Azure resources?
+
+The recommended approach is:
+
+GitHub OIDC (Workload Identity Federation)
+Azure authentication without stored client secrets
+Retrieve required secrets from Key Vault at runtime
+Real Interview Scenario
+
+Question:
+
+A developer committed a SQL password to GitHub. How would you fix it?
+
+Answer:
+
+Remove the password from the repository and rotate it immediately.
+Store the new password in Azure Key Vault.
+Configure the application or pipeline to retrieve the secret securely using Managed Identity (or GitHub OIDC + Key Vault).
+Enable secret scanning and update development practices to prevent future leaks.
+Hands-on Assignment
+
+Create:
+
+Key Vault
+Secret (db-password)
+
+Explore:
+
+Certificates
+Keys
+RBAC
+Soft Delete
+Purge Protection
+Networking
+Diagnostic Settings
+Key Takeaways
+Azure Key Vault securely stores sensitive information.
+Store passwords, connection strings, and API tokens as Secrets.
+Use Keys for cryptographic operations.
+Use Certificates for SSL/TLS.
+Prefer Azure RBAC over legacy access policies.
+Use Managed Identity or GitHub OIDC to access Key Vault securely.
+Enable Soft Delete and Purge Protection for resilience.
+⭐ Enterprise Interview Tip
+
+A strong answer to:
+
+"How do you securely manage secrets in Azure?"
+
+"We store all sensitive values in Azure Key Vault. Azure resources authenticate using Managed Identity, and GitHub Actions uses OIDC-based federation to authenticate to Azure without client secrets. Access is controlled using Azure RBAC, and we enable Soft Delete and Purge Protection to protect against accidental deletion."
+
+This answer reflects current Azure best practices and is well aligned with enterprise environments.

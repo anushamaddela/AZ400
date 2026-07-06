@@ -57,6 +57,7 @@ Virtual Network (10.0.0.0/16)
  ▼      ▼             ▼
 Web    App          Database
 Subnet Subnet       Subnet
+
 Why Do We Need a VNet?
 
 Without a VNet:
@@ -70,6 +71,7 @@ Private communication.
 Network isolation.
 Better security.
 Easier access control.
+
 What is an Address Space?
 
 An Address Space defines the range of private IP addresses available inside a VNet.
@@ -306,3 +308,18 @@ db-subnet
 List the subnets using Azure CLI.
 Explain why Azure reserves five IP addresses in each subnet.
 Draw your VNet architecture on paper or using a diagramming tool to reinforce the concepts.
+What's Next?
+
+The next chapter is Module 2 – Chapter 3: Network Security Groups (NSGs) & Application Security Groups (ASGs).
+
+You'll learn:
+
+Inbound vs outbound rules
+Rule priorities
+Allow vs deny
+NSG association with subnets and NICs
+ASGs
+Enterprise firewall design
+Hands-on labs
+
+This is one of the most commonly asked Azure networking topics in DevOps interviews.

@@ -1,0 +1,497 @@
+Module 2 – Chapter 9: Azure Monitor, Log Analytics & Application Insights
+
+By the end of this chapter, you'll know how enterprise teams monitor Azure applications.
+
+How do you monitor your applications?
+How do you know if AKS is down?
+How do you investigate production issues?
+How do you create alerts?
+
+Learning Objectives
+
+You'll learn:
+
+Azure Monitor
+Log Analytics Workspace
+Application Insights
+Alerts
+Action Groups
+Dashboards
+Metrics vs Logs
+KQL Basics
+Enterprise Monitoring Architecture
+Hands-on Labs
+Monitoring in Azure
+
+Imagine your application is running on AKS.
+
+How do you know if:
+
+CPU reaches 95%?
+A pod crashes?
+The application is slow?
+Users receive HTTP 500 errors?
+
+The answer is Azure Monitor.
+
+Azure Monitoring Architecture
+                Azure Resources
+                      │
+      ┌───────────────┼───────────────┐
+      ▼               ▼               ▼
+     VM              AKS        App Service
+      │               │               │
+      └───────────────┼───────────────┘
+                      ▼
+               Azure Monitor
+                      │
+         ┌────────────┼────────────┐
+         ▼            ▼            ▼
+     Metrics      Log Analytics   Alerts
+                      │
+                      ▼
+             Application Insights
+What is Azure Monitor?
+
+Azure Monitor is Azure's central monitoring platform.
+
+It collects:
+
+Metrics
+Logs
+Events
+Alerts
+Diagnostics
+Azure Monitor Can Monitor
+Virtual Machines
+AKS
+Azure SQL
+Storage Accounts
+Load Balancer
+Application Gateway
+Key Vault
+Application Insights
+Custom Applications
+Metrics vs Logs
+
+This is one of the most common interview questions.
+
+Metrics	Logs
+Numeric values	Detailed records
+Lightweight	Rich information
+Near real-time	Used for investigation
+Example: CPU 85%	Example: HTTP 500 stack trace
+Example
+
+Metrics
+
+CPU = 80%
+Memory = 60%
+Requests = 200/sec
+
+Logs
+
+User Login Failed
+
+Database Timeout
+
+Exception
+
+Stack Trace
+Hands-on Lab 1
+
+Open:
+
+Azure Monitor
+
+Explore:
+
+Metrics
+Alerts
+Logs
+Activity Log
+Insights
+Workbooks
+What is Log Analytics?
+
+Log Analytics is where Azure stores and analyzes logs.
+
+Think of it as a central log database.
+
+Architecture
+Azure Resources
+        │
+        ▼
+Log Analytics Workspace
+        │
+        ▼
+KQL Queries
+Create a Log Analytics Workspace
+
+Portal
+
+Log Analytics Workspace
+
+↓
+
+Create
+
+Name:
+
+law-az400-dev
+
+CLI
+
+az monitor log-analytics workspace create \
+  --resource-group rg-az400-dev \
+  --workspace-name law-az400-dev
+Kusto Query Language (KQL)
+
+Azure uses KQL to query logs.
+
+Example:
+
+AzureActivity
+
+| limit 10
+
+Show recent activity.
+
+Another example:
+
+Heartbeat
+
+| summarize count()
+
+Count VM heartbeat records.
+
+For AKS:
+
+ContainerLog
+
+| limit 20
+
+View recent container logs.
+
+Application Insights
+
+Application Insights monitors the application, not just the infrastructure.
+
+It collects:
+
+Requests
+Dependencies
+Exceptions
+Performance
+Availability
+User sessions
+Architecture
+Application
+      │
+      ▼
+Application Insights
+      │
+      ▼
+Azure Monitor
+Example
+
+User opens:
+
+www.shop.com
+
+Application Insights records:
+
+Request Time
+Response Time
+HTTP Status
+Exceptions
+Dependencies
+User Session
+Hands-on Lab 2
+
+Create:
+
+appi-az400-dev
+
+Portal
+
+Application Insights
+
+↓
+
+Create
+Alerts
+
+Monitoring without alerts isn't useful.
+
+Alerts notify you automatically when a condition is met.
+
+Example
+CPU > 80%
+
+↓
+
+Azure Monitor Alert
+
+↓
+
+Email
+SMS
+Webhook
+Logic App
+Alert Rule Components
+Component	Example
+Resource	AKS
+Signal	CPU
+Condition	>80%
+Action	Email
+Action Groups
+
+Action Groups define what happens when an alert fires.
+
+Examples:
+
+Email
+SMS
+Push Notification
+Azure Function
+Logic App
+Webhook
+Hands-on Lab 3
+
+Create:
+
+Action Group
+
+ag-devops
+
+Configure:
+
+Email
+
+↓
+
+Your email address
+
+Hands-on Lab 4
+
+Create Alert
+
+Resource:
+
+VM
+
+Metric:
+
+CPU Percentage
+
+Condition:
+
+Greater than 80%
+
+Action Group:
+
+ag-devops
+Workbooks
+
+Workbooks provide dashboards.
+
+Example:
+
+CPU
+
+Memory
+
+Network
+
+Pods
+
+Availability
+
+Requests
+
+Everything on one dashboard.
+
+Activity Log
+
+Activity Log records Azure management operations.
+
+Examples:
+
+VM Created
+
+VM Deleted
+
+Storage Account Updated
+
+RBAC Changed
+
+Useful for auditing.
+
+Diagnostic Settings
+
+Diagnostic Settings send logs to:
+
+Log Analytics
+Storage Account
+Event Hub
+
+Example:
+
+AKS
+
+↓
+
+Diagnostic Settings
+
+↓
+
+Log Analytics
+Enterprise Monitoring Architecture
+AKS
+ │
+ ▼
+Azure Monitor
+ │
+ ▼
+Log Analytics
+ │
+ ▼
+Application Insights
+ │
+ ▼
+Alerts
+ │
+ ▼
+Email
+
+SMS
+
+Teams
+Monitoring an AKS Cluster
+
+Monitor:
+
+Node CPU
+Node Memory
+Pod Restarts
+Failed Pods
+Deployment Failures
+Network Traffic
+Real Production Example
+
+Alert:
+
+HTTP 500 > 100
+
+↓
+
+Application Insights
+
+↓
+
+Exception
+
+↓
+
+Developer fixes code
+
+↓
+
+Pipeline
+
+↓
+
+Redeploy
+
+Azure DevOps Monitoring
+
+Monitor:
+
+GitHub Actions
+
+↓
+
+Deployment
+
+↓
+
+AKS
+
+↓
+
+Application
+
+↓
+
+Azure Monitor
+
+↓
+
+Alert
+
+↓
+
+DevOps Team
+
+Interview Questions
+1. What is Azure Monitor?
+
+Azure Monitor is Azure's centralized monitoring platform that collects metrics, logs, and diagnostic data from Azure resources and applications.
+
+2. What is the difference between Azure Monitor and Application Insights?
+Azure Monitor	Application Insights
+Monitors Azure resources	Monitors application behavior
+Infrastructure-focused	Application-focused
+CPU, Memory, Disk, Network	Requests, Dependencies, Exceptions
+3. What is Log Analytics?
+
+A Log Analytics Workspace stores logs from Azure resources and enables querying using Kusto Query Language (KQL).
+
+4. What is KQL?
+
+KQL (Kusto Query Language) is the query language used to search, analyze, and visualize log data in Azure Monitor and Log Analytics.
+
+5. What are Action Groups?
+
+Action Groups define the notifications or automated actions (email, SMS, webhook, Logic App, etc.) that occur when an alert is triggered.
+
+Real Interview Scenario
+
+Question:
+
+Your AKS application suddenly starts returning HTTP 500 errors. How would you investigate?
+
+Answer:
+
+Check Azure Monitor alerts for recent issues.
+Review Application Insights to identify failing requests and exceptions.
+Query logs in Log Analytics using KQL.
+Inspect AKS pod status (kubectl get pods) and pod logs (kubectl logs).
+Verify whether a recent deployment introduced the issue.
+Roll back if necessary and perform a root cause analysis.
+Hands-on Assignment
+
+Create:
+
+Log Analytics Workspace (law-az400-dev)
+Application Insights (appi-az400-dev)
+Action Group (ag-devops)
+CPU Alert for a VM
+
+Explore:
+
+Metrics
+Logs
+Workbooks
+Activity Log
+Diagnostic Settings
+Quick Revision
+Service	Purpose
+Azure Monitor	Monitor Azure resources
+Log Analytics	Store and query logs
+Application Insights	Monitor applications
+Alerts	Notify when conditions occur
+Action Groups	Define notification actions
+Workbooks	Visual dashboards
+Activity Log	Azure management operations

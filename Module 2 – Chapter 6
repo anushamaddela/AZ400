@@ -1,0 +1,401 @@
+Module 2 – Chapter 6: Azure Storage
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is an Azure Storage Account?
+Types of Azure Storage
+Blob Storage
+Azure Files
+Queue Storage
+Table Storage
+Managed Disks
+Storage Redundancy (LRS, ZRS, GRS, GZRS)
+Storage Access Tiers
+Security Best Practices
+Enterprise Architecture
+Hands-on Labs
+What is Azure Storage?
+
+Azure Storage is Microsoft's cloud storage service used to store:
+
+Files
+Images
+Videos
+Backups
+Virtual Machine disks
+Logs
+Application data
+Terraform state files
+
+Think of it as Azure's secure and scalable storage platform.
+
+Azure Storage Architecture
+                    Storage Account
+                           │
+      ┌───────────┬─────────┬──────────┬──────────┐
+      ▼           ▼         ▼          ▼
+    Blob       Files      Queue      Table
+                           │
+                           ▼
+                     Managed Disks
+
+A Storage Account is the top-level container that holds different storage services.
+
+What is a Storage Account?
+
+A Storage Account provides a unique namespace for Azure storage services.
+
+Example:
+
+staz400dev001
+
+Inside it, you can create:
+
+Blob Containers
+File Shares
+Queues
+Tables
+Storage Account Types
+Type	Purpose
+Standard General Purpose v2	Most workloads
+Premium Block Blob	High-performance blobs
+Premium File Share	High-performance SMB shares
+Premium Page Blob	VM disks
+
+Recommendation: For most projects, use Standard General Purpose v2 (GPv2).
+
+Storage Services
+1. Blob Storage
+
+Blob = Binary Large Object
+
+Stores:
+
+Images
+Videos
+PDFs
+ZIP files
+Docker artifacts
+Backups
+Terraform state files
+
+Example:
+
+Container
+│
+├── image.png
+├── backup.zip
+├── terraform.tfstate
+└── app.log
+Enterprise Use Cases
+Terraform Remote Backend
+Application uploads
+Static website hosting
+Log storage
+Blob Storage Tiers
+Tier	Use
+Hot	Frequently accessed
+Cool	Occasionally accessed
+Cold	Rarely accessed (lower cost, higher retrieval cost)
+Archive	Long-term archival
+Example
+File	Tier
+Website images	Hot
+Monthly reports	Cool
+5-year-old backups	Archive
+Hands-on Lab 1
+
+Create a Storage Account.
+
+Portal:
+
+Name:
+staz400dev001
+
+Performance:
+
+Standard
+
+Redundancy:
+
+LRS
+
+CLI:
+
+az storage account create \
+  --name staz400dev001 \
+  --resource-group rg-az400-dev \
+  --location centralindia \
+  --sku Standard_LRS
+Hands-on Lab 2
+
+Create a Blob Container.
+
+Portal:
+
+Storage Account
+    │
+Blob Containers
+    │
+Create
+
+Name:
+
+terraform-state
+
+Upload:
+
+terraform.tfstate
+Azure Files
+
+Azure Files provides SMB/NFS file shares.
+
+Multiple VMs can mount the same share.
+
+Example:
+
+VM1
+    │
+VM2
+    │
+VM3
+     │
+     ▼
+Azure File Share
+Use Cases
+Shared configuration files
+Logs
+Application data
+Home directories
+Hands-on Lab 3
+
+Create:
+
+fileshare-dev
+
+Mount it on a Windows or Linux VM later in the course.
+
+Queue Storage
+
+Queue Storage stores messages between applications.
+
+Example:
+
+Application
+     │
+     ▼
+Queue
+     │
+     ▼
+Worker
+Real Example
+
+Customer uploads a file.
+
+Instead of processing immediately:
+
+Upload
+   │
+   ▼
+Queue
+   │
+   ▼
+Background Worker
+
+This improves scalability and reliability.
+
+Table Storage
+
+Stores NoSQL key-value data.
+
+Example:
+
+EmployeeID
+EmployeeName
+Department
+
+Suitable for simple structured data.
+
+Managed Disks
+
+Managed Disks are storage volumes attached to Azure Virtual Machines.
+
+Example:
+
+VM
+ │
+ ▼
+Managed Disk
+Types of Managed Disks
+Type	Use
+Standard HDD	Backup, archive
+Standard SSD	Development
+Premium SSD	Production
+Premium SSD v2	High-performance databases
+Ultra Disk	Very high IOPS workloads
+Hands-on Lab 4
+
+Create a VM.
+
+Observe:
+
+OS Disk
+
+Azure automatically creates a Managed Disk.
+
+Storage Redundancy
+
+Azure automatically replicates your data.
+
+LRS (Locally Redundant Storage)
+Datacenter
+
+Copy1
+Copy2
+Copy3
+
+Three copies in a single datacenter.
+
+ZRS (Zone-Redundant Storage)
+Zone1
+Zone2
+Zone3
+
+Copies are distributed across availability zones.
+
+GRS (Geo-Redundant Storage)
+Central India
+        │
+        ▼
+South India
+
+Replicates to a paired region.
+
+GZRS (Geo-Zone Redundant Storage)
+
+Combines:
+
+Zone redundancy
+Geographic redundancy
+
+Highest resilience.
+
+Comparison
+Type	Copies	Survives
+LRS	3	Disk/server failure
+ZRS	Across zones	Zone failure
+GRS	Across regions	Regional outage
+GZRS	Zones + regions	Zone and regional outages
+Enterprise Storage Architecture
+Application
+     │
+     ▼
+Blob Storage
+     │
+     ▼
+Private Endpoint
+     │
+     ▼
+Azure Backup
+
+No public internet exposure.
+
+Storage Security
+
+Best Practices:
+
+Use Private Endpoints.
+Disable public access if not required.
+Use Microsoft Entra ID (Azure AD) authentication.
+Store secrets in Azure Key Vault.
+Enable soft delete.
+Enable versioning.
+Encrypt data at rest (enabled by default).
+Storage in Azure DevOps
+DevOps Task	Storage Service
+Terraform Remote State	Blob Storage
+Build Artifacts	Blob Storage
+Application Logs	Blob Storage
+Shared Configurations	Azure Files
+VM Disks	Managed Disks
+Backups	Blob Storage
+Hands-on Lab 5 (Enterprise)
+
+We'll use Blob Storage as the Terraform remote backend later.
+
+Example backend configuration:
+
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-az400-dev"
+    storage_account_name = "staz400dev001"
+    container_name       = "terraform-state"
+    key                  = "prod.tfstate"
+  }
+}
+
+We'll implement this practically in the Terraform module.
+
+Interview Questions
+1. What is an Azure Storage Account?
+
+A Storage Account is a top-level Azure resource that provides a namespace for storing blobs, files, queues, tables, and other storage services.
+
+2. What is Blob Storage?
+
+Blob Storage is an object storage service used for unstructured data such as images, videos, backups, logs, and Terraform state files.
+
+3. What is Azure Files?
+
+Azure Files provides managed SMB/NFS file shares that multiple VMs or applications can mount and access.
+
+4. Which redundancy option would you choose for a production application?
+LRS for development or non-critical workloads.
+ZRS for high availability within a region.
+GRS/GZRS for disaster recovery across regions, depending on business requirements.
+
+The choice depends on availability, compliance, and budget requirements.
+
+5. Why do DevOps Engineers use Blob Storage?
+
+Common uses include:
+
+Terraform remote state
+Build artifacts
+Application logs
+Backups
+Static website assets
+Real Project Scenario
+
+Question:
+
+Your Terraform state file is currently stored on your laptop. Team members overwrite each other's changes. How would you solve this?
+
+Answer:
+
+Create an Azure Storage Account.
+Create a Blob Container (for example, terraform-state).
+Configure Terraform to use the Azure Storage backend.
+Enable state locking (typically with Azure Storage and appropriate backend configuration) so the team safely shares a single source of truth.
+Hands-on Assignment
+Create
+Storage Account: staz400dev001
+Blob Container: terraform-state
+File Share: fileshare-dev
+Explore
+Storage Explorer
+Access Keys
+Shared Access Signatures (SAS)
+Networking
+Lifecycle Management
+Soft Delete
+Versioning
+Key Takeaways
+Storage Account is the foundation for Azure storage services.
+Blob Storage is the most common storage type used by DevOps engineers.
+Azure Files provides managed shared file storage.
+Managed Disks back Azure Virtual Machines.
+Choose the appropriate redundancy (LRS, ZRS, GRS, or GZRS) based on your availability and disaster recovery requirements.
+Secure storage using Private Endpoints, Microsoft Entra ID, encryption, and lifecycle policies.
+

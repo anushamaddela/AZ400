@@ -1,87 +1,238 @@
-Module 2 – Azure Fundamentals
-What You'll Build
-Azure Subscription
-        │
-        ▼
-Resource Group
-        │
-        ▼
-Virtual Network
-        │
-        ▼
-Subnets
-        │
-        ▼
-NSG
-        │
-        ▼
+Module 2 – Chapter 1: Azure Regions, Availability Zones & Resource Groups
+Learning Objectives
+
+By the end of this chapter, you'll know:
+
+What an Azure Region is
+What an Availability Zone is
+What a Resource Group is
+How resources are organized
+Best practices
+Hands-on lab
+What is Microsoft Azure?
+
+Microsoft Azure is a cloud computing platform that provides services such as:
+
 Virtual Machines
-        │
-        ▼
-Azure Container Registry
-        │
-        ▼
+Networking
+Storage
+Databases
+Kubernetes
+AI
+Monitoring
+Security
+
+Instead of buying physical servers, you rent Azure resources on demand.
+
+Azure Global Infrastructure
+
+Microsoft operates datacenters around the world.
+
+India
+ ├── Central India
+ ├── South India
+ └── West India
+
+USA
+ ├── East US
+ ├── East US 2
+ ├── Central US
+ └── West US
+
+Europe
+ ├── North Europe
+ └── West Europe
+
+A Region is one of these geographic locations where Azure hosts resources.
+
+What is an Azure Region?
+
+An Azure Region is a geographic area containing one or more datacenters.
+
+Examples:
+
+Central India
+East US
+West Europe
+Southeast Asia
+Why Regions Matter
+Lower latency
+Regulatory compliance
+Disaster recovery
+Data residency
+Cost optimization
+Example
+
+If your users are mainly in Hyderabad, deploying to Central India generally provides lower latency than deploying to East US.
+
+Hands-on Lab 1: View Azure Regions
+Azure Portal
+Sign in to the Azure portal.
+Create a resource (don't complete the creation).
+Open the Region dropdown.
+Browse the available regions.
+Azure CLI
+az account show
+az account list-locations --output table
+
+Observe the region names available to your subscription.
+
+What are Availability Zones?
+
+Availability Zones are physically separate datacenters within the same Azure region.
+
+Example:
+
+Central India
+
+      Region
+         │
+ ┌───────┼────────┐
+ │       │        │
+Zone 1 Zone 2 Zone 3
+
+Each zone has:
+
+Independent power
+Independent cooling
+Independent networking
+
+If one zone fails, workloads in other zones can continue running.
+
+Example
+
+Deploy two virtual machines:
+
+VM1 → Zone 1
+
+VM2 → Zone 2
+
+If Zone 1 experiences an outage, VM2 in Zone 2 remains available (assuming your application is designed for redundancy).
+
+When Should You Use Availability Zones?
+
+Use them for:
+
+Production applications
+Databases
 AKS
-        │
-        ▼
-Application Gateway
-        │
-        ▼
-Azure Monitor
-Module 2 Chapters
-Chapter 1
-Azure Regions
-Availability Zones
-Resource Groups
-Hands-on
-Chapter 2
-Azure Virtual Networks
-Subnets
-Address Spaces
-Hands-on
-Chapter 3
-Network Security Groups (NSG)
-Application Security Groups (ASG)
-Hands-on
-Chapter 4
-Route Tables
-User Defined Routes
-Service Endpoints
-Private Endpoints
-Hands-on
-Chapter 5
-Public IP
-NAT Gateway
-Azure Load Balancer
-Application Gateway
-Azure Firewall
-Hands-on
-Chapter 6
-Azure Storage
-Blob
-File Share
-Disk
-Queue
-Table
-Hands-on
-Chapter 7
-Azure Identity
-Microsoft Entra ID
-RBAC
-Service Principal
-Managed Identity
-Hands-on
-Chapter 8
-Azure Key Vault
-Secrets
-Certificates
-Keys
-Hands-on
-Chapter 9
-Azure Monitor
-Log Analytics
-Application Insights
-Alerts
-Hands-on
-Chapter 10
-Mini Enterprise Azure Project
+Load Balancers
+Critical virtual machines
+
+They are generally not necessary for simple development or test environments.
+
+What is a Resource Group?
+
+A Resource Group (RG) is a logical container for Azure resources.
+
+Resource Group
+
+├── Virtual Machine
+├── Virtual Network
+├── Storage Account
+├── AKS
+├── Azure Container Registry
+└── Key Vault
+
+A resource belongs to one resource group.
+
+Why Use Resource Groups?
+Organize related resources
+Apply RBAC
+Manage costs
+Apply tags
+Delete an entire environment together
+Real Enterprise Example
+rg-product-dev
+
+├── vnet-product-dev
+├── aks-product-dev
+├── acr-product-dev
+├── kv-product-dev
+├── log-product-dev
+└── vm-github-runner
+
+This mirrors the kind of environment you've been building.
+
+Resource Group Naming Convention
+
+A common pattern:
+
+rg-<application>-<environment>
+
+Examples:
+
+rg-product-dev
+rg-product-qa
+rg-product-prod
+rg-hr-prod
+rg-payroll-dev
+Best Practices
+Separate Dev, QA, UAT, and Prod.
+Use consistent naming conventions.
+Tag resources (Environment, Owner, CostCenter, Project).
+Avoid mixing unrelated applications in the same Resource Group.
+Grant RBAC at the Resource Group level when appropriate.
+Hands-on Lab 2: Create a Resource Group
+Azure Portal
+Open Resource Groups.
+Click Create.
+Subscription: Select your subscription.
+Resource Group Name:
+rg-az400-dev
+Region:
+Central India
+Click Review + Create → Create.
+Azure CLI
+az group create \
+  --name rg-az400-dev \
+  --location centralindia
+
+Verify it:
+
+az group list --output table
+
+View details:
+
+az group show --name rg-az400-dev
+Hands-on Lab 3: Add Tags
+
+Using Azure CLI:
+
+az group update \
+  --name rg-az400-dev \
+  --set tags.Environment=Dev tags.Project=AZ400 tags.Owner=Anusha
+
+Verify:
+
+az group show --name rg-az400-dev
+
+You should see the tags attached to the resource group.
+
+Interview Questions
+1. What is an Azure Region?
+
+An Azure Region is a geographic location containing one or more Azure datacenters where cloud resources are hosted.
+
+2. What is the difference between an Azure Region and an Availability Zone?
+Region	Availability Zone
+Geographic location	Physically separate datacenter within a region
+Example: Central India	Example: Zone 1, Zone 2, Zone 3
+3. What is a Resource Group?
+
+A Resource Group is a logical container that groups related Azure resources for management, security, and lifecycle operations.
+
+4. Can resources from different regions exist in the same Resource Group?
+
+Yes. A Resource Group is a logical container and can contain resources from multiple Azure regions, although many organizations keep related resources in the same region for simplicity and latency considerations.
+
+Assignment
+Create the rg-az400-dev Resource Group.
+Add the tags:
+Environment = Dev
+Project = AZ400
+Owner = Anusha
+List all Azure regions using the CLI.
+Explain the difference between a Region and an Availability Zone in your own words.
+
+Once you've completed these labs, we'll move to Module 2 – Chapter 2: Azure Virtual Networks (VNet), Address Spaces, and Subnets, where we'll start building the network foundation for the rest of the course.

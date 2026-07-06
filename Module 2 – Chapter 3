@@ -1,0 +1,376 @@
+Module 2 – Chapter 3: Network Security Groups (NSGs) & Application Security Groups (ASGs)
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is an NSG?
+How NSGs work
+Inbound vs Outbound rules
+Rule priorities
+Default Azure NSG rules
+NSG association (Subnet vs NIC)
+What is an ASG?
+Enterprise examples
+Hands-on labs
+Why Do We Need NSGs?
+
+Imagine you have three VMs:
+
+VM1 (Web)
+VM2 (Application)
+VM3 (Database)
+
+Without any firewall:
+
+Internet
+     │
+     ▼
+ All Traffic Allowed ❌
+
+This is insecure.
+
+With an NSG:
+
+Internet
+     │
+     ▼
+Allow HTTPS (443)
+Allow SSH (22) from Admin IP
+Deny Everything Else
+
+The NSG acts like a firewall for Azure resources.
+
+What is a Network Security Group (NSG)?
+
+An NSG is a Layer 3/Layer 4 firewall that filters network traffic to Azure resources.
+
+It controls:
+
+Source
+Destination
+Port
+Protocol
+Direction
+Action (Allow/Deny)
+NSG Architecture
+Internet
+     │
+     ▼
+Public IP
+     │
+     ▼
+NSG
+     │
+     ▼
+VM
+
+Only traffic allowed by the NSG reaches the VM.
+
+NSG Rule Components
+
+Every rule has:
+
+Property	Example
+Priority	100
+Source	Internet
+Source Port	*
+Destination	VM
+Destination Port	443
+Protocol	TCP
+Action	Allow
+Rule Priority
+
+Azure processes rules from the lowest priority number to the highest.
+
+Priority 100 → Checked first
+Priority 200 → Checked second
+Priority 300 → Checked third
+
+Once a rule matches, Azure stops evaluating further rules.
+
+Example
+Priority	Rule
+100	Allow HTTPS (443)
+200	Allow SSH (22)
+300	Deny All
+
+Traffic to port 443 matches rule 100 and is allowed. Rule 300 is never evaluated.
+
+Inbound vs Outbound Rules
+Inbound
+
+Traffic coming into Azure resources.
+
+Example:
+
+Internet
+      │
+      ▼
+Virtual Machine
+
+Examples:
+
+HTTPS
+SSH
+RDP
+Outbound
+
+Traffic leaving Azure resources.
+
+Example:
+
+VM
+ │
+ ▼
+Azure Storage
+
+Examples:
+
+Database connections
+Internet access
+API calls
+Default NSG Rules
+
+Azure automatically creates default rules.
+
+Inbound
+Priority	Rule	Action
+65000	AllowVNetInBound	Allow
+65001	AllowAzureLoadBalancerInBound	Allow
+65500	DenyAllInBound	Deny
+Outbound
+Priority	Rule	Action
+65000	AllowVNetOutBound	Allow
+65001	AllowInternetOutBound	Allow
+65500	DenyAllOutBound	Deny
+
+You cannot delete these default rules, but you can override them with custom rules using a lower priority number.
+
+Custom NSG Example
+
+Suppose you have a web server.
+
+Rules:
+
+Priority	Port	Action
+100	443	Allow
+110	80	Allow
+120	22	Allow from Admin IP only
+4096	*	Deny
+
+This means:
+
+Users can access the website.
+Only administrators can SSH.
+All other inbound traffic is blocked.
+NSG Association
+
+An NSG can be associated with:
+
+Subnet
+Network Interface (NIC)
+Subnet-level NSG
+VNet
+ │
+ ▼
+Web Subnet
+     │
+     ├── VM1
+     ├── VM2
+     └── VM3
+
+One NSG protects all VMs in the subnet.
+
+NIC-level NSG
+VM1
+ │
+ ▼
+NIC
+ │
+ ▼
+NSG
+
+Only that VM is affected.
+
+Which Should You Use?
+Scenario	Best Choice
+Same rules for many VMs	Subnet NSG
+Different rules per VM	NIC NSG
+
+In enterprise environments, Subnet NSGs are much more common because they are easier to manage.
+
+What is an Application Security Group (ASG)?
+
+An ASG lets you group VMs logically instead of writing rules based on IP addresses.
+
+Without ASG
+Allow:
+10.0.1.4
+10.0.1.5
+10.0.1.6
+
+If IPs change, rules must be updated.
+
+With ASG
+Web Servers
+      │
+      ▼
+ASG-Web
+
+NSG Rule:
+
+Source = Internet
+Destination = ASG-Web
+Port = 443
+Allow
+
+Any VM added to ASG-Web automatically follows the rule.
+
+Enterprise Example
+Internet
+      │
+      ▼
+Application Gateway
+      │
+      ▼
+Web Subnet
+      │
+      ▼
+ASG-Web
+      │
+      ▼
+App Subnet
+      │
+      ▼
+ASG-App
+      │
+      ▼
+Database Subnet
+      │
+      ▼
+ASG-DB
+
+Traffic flow:
+
+Internet → Web only
+Web → App
+App → Database
+Internet → Database ❌ Denied
+Hands-on Lab 1: Create an NSG
+Azure Portal
+
+Create:
+
+Setting	Value
+Name	nsg-web-dev
+Resource Group	rg-az400-dev
+Region	Central India
+Azure CLI
+az network nsg create \
+  --resource-group rg-az400-dev \
+  --name nsg-web-dev
+
+Verify:
+
+az network nsg list --output table
+Hands-on Lab 2: Create an HTTPS Rule
+az network nsg rule create \
+  --resource-group rg-az400-dev \
+  --nsg-name nsg-web-dev \
+  --name AllowHTTPS \
+  --priority 100 \
+  --direction Inbound \
+  --access Allow \
+  --protocol Tcp \
+  --destination-port-ranges 443
+Hands-on Lab 3: Create an SSH Rule
+
+Allow SSH only from your public IP.
+
+az network nsg rule create \
+  --resource-group rg-az400-dev \
+  --nsg-name nsg-web-dev \
+  --name AllowSSH \
+  --priority 110 \
+  --direction Inbound \
+  --access Allow \
+  --protocol Tcp \
+  --source-address-prefixes 115.114.88.222/32 \
+  --destination-port-ranges 22
+
+Replace <YOUR_PUBLIC_IP> with your actual public IP address.
+
+Hands-on Lab 4: Associate NSG with a Subnet
+
+Portal:
+
+Open Virtual Network
+Select Subnets
+Choose web-subnet
+Associate nsg-web-dev
+
+CLI:
+
+az network vnet subnet update \
+  --resource-group rg-az400-dev \
+  --vnet-name vnet-az400-dev \
+  --name web-subnet \
+  --network-security-group nsg-web-dev
+Real Project Example
+
+In your Azure project:
+
+Internet
+     │
+     ▼
+Application Gateway
+     │
+     ▼
+Web Subnet (NSG)
+     │
+     ▼
+AKS Subnet (NSG)
+     │
+     ▼
+Private Endpoint Subnet (NSG)
+
+Each subnet has different security rules, enforcing least-privilege access.
+
+Interview Questions
+1. What is an NSG?
+
+An NSG is a firewall that filters inbound and outbound network traffic for Azure resources using security rules.
+
+2. What is the difference between an NSG and an ASG?
+NSG	ASG
+Defines traffic filtering rules	Groups VMs logically
+Controls traffic	Simplifies rule management
+3. Can one NSG be associated with multiple subnets?
+
+Yes. An NSG can be associated with multiple subnets or multiple network interfaces, depending on your design.
+
+4. Which is better: subnet-level or NIC-level NSGs?
+
+For most enterprise environments, subnet-level NSGs are preferred because they are easier to manage and provide consistent security for all resources in the subnet.
+
+5. Can an NSG allow HTTP while blocking HTTPS?
+
+Yes. Rules are independent. You could:
+
+Allow TCP 80
+Deny TCP 443
+
+or vice versa, depending on your application's requirements.
+
+Assignment
+Create an NSG named nsg-web-dev.
+Add an inbound rule to allow HTTPS (443).
+Add an inbound SSH rule restricted to your public IP.
+Associate the NSG with web-subnet.
+Verify the effective security rules in the Azure portal.
+Key Takeaways
+NSGs are Azure's primary network traffic filtering mechanism.
+Rules are processed in priority order (lowest number first).
+Subnet-level NSGs are generally preferred in enterprise environments.
+ASGs simplify security rule management by grouping resources logically instead of relying on IP addresses.
+Azure provides default NSG rules, but custom rules with higher precedence can override them.

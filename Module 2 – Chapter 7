@@ -1,0 +1,480 @@
+Module 2 – Chapter 7: Azure Identity (Microsoft Entra ID), RBAC, Service Principals & Managed Identity
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is Microsoft Entra ID (Azure AD)?
+Authentication vs Authorization
+What is RBAC?
+Azure RBAC roles
+What is a Service Principal?
+What is Managed Identity?
+System-assigned vs User-assigned Managed Identity
+Enterprise authentication architecture
+Hands-on Labs
+Before We Begin
+
+There are four concepts you should never confuse.
+
+Concept	Purpose
+Microsoft Entra ID	Identity Management
+RBAC	Authorization (Permissions)
+Service Principal	Identity for Applications
+Managed Identity	Azure-managed identity for Azure resources
+Authentication vs Authorization
+
+This is one of the most common interview questions.
+
+Authentication
+
+Authentication answers:
+
+Who are you?
+
+Example:
+
+Username
+Password
+
+Azure verifies your identity.
+
+Authorization
+
+Authorization answers:
+
+What are you allowed to do?
+
+Example:
+
+Read Storage
+
+Create VM
+
+Delete Resource Group
+
+These permissions are controlled using RBAC.
+
+Real Example
+Anusha
+     │
+     ▼
+Login to Azure
+(Authentication)
+     │
+     ▼
+Reader Role
+(Authorization)
+
+You can view resources but cannot delete them.
+
+What is Microsoft Entra ID?
+
+Microsoft Entra ID (formerly Azure Active Directory) is Azure's cloud-based identity and access management service.
+
+It manages:
+
+Users
+Groups
+Applications
+Service Principals
+Managed Identities
+Entra ID Architecture
+Microsoft Entra ID
+
+├── Users
+├── Groups
+├── Applications
+├── Service Principals
+└── Managed Identities
+Example
+
+Company:
+
+Contoso
+
+Employees:
+
+Anusha
+
+Rahul
+
+Priya
+
+All identities are managed through Entra ID.
+
+Hands-on Lab 1
+
+Portal
+
+Go to:
+
+Microsoft Entra ID
+
+Explore:
+
+Users
+Groups
+Enterprise Applications
+App Registrations
+Roles & Administrators
+
+Don't change anything yet—just become familiar with the portal.
+
+What is RBAC?
+
+RBAC stands for Role-Based Access Control.
+
+RBAC determines:
+
+Who can perform which actions on which resources?
+
+RBAC Structure
+User
+    │
+    ▼
+Role
+    │
+    ▼
+Resource
+Built-in Roles
+Role	Permissions
+Owner	Full control, including access management
+Contributor	Manage resources, but cannot assign roles
+Reader	View resources only
+User Access Administrator	Manage RBAC assignments
+RBAC Scope
+
+Azure permissions can be assigned at different levels.
+
+Management Group
+        │
+        ▼
+Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Resource
+
+Permissions inherited at a higher scope flow down unless specifically restricted.
+
+Example
+
+Assign:
+
+Reader
+
+at:
+
+Resource Group
+
+The user can view every resource in that Resource Group.
+
+Hands-on Lab 2
+
+Assign yourself the Reader role on a test Resource Group (or inspect existing role assignments if you don't want to modify permissions).
+
+Portal:
+
+Resource Group
+    │
+Access Control (IAM)
+    │
+Add Role Assignment
+
+Select:
+
+Reader
+What is a Service Principal?
+
+A Service Principal is an identity for an application or automation.
+
+Unlike a human user, it is used by software.
+
+Example
+GitHub Actions
+        │
+        ▼
+Service Principal
+        │
+        ▼
+Azure
+
+GitHub authenticates using the Service Principal to deploy resources.
+
+Why Do We Need It?
+
+Suppose GitHub Actions wants to:
+
+Create a Resource Group
+Deploy AKS
+Push images to ACR
+
+GitHub cannot log in as a human.
+
+Instead:
+
+GitHub Actions
+
+uses a
+
+Service Principal
+Authentication Flow
+GitHub Actions
+      │
+      ▼
+Client ID
+Client Secret
+Tenant ID
+Subscription ID
+      │
+      ▼
+Azure
+Hands-on Lab 3
+
+Create a Service Principal:
+
+az ad sp create-for-rbac \
+  --name sp-az400-dev
+
+Example output:
+
+{
+  "appId": "...",
+  "password": "...",
+  "tenant": "..."
+}
+
+Store these securely—never commit them to Git.
+
+What is Managed Identity?
+
+Managed Identity is an Azure-managed identity assigned to an Azure resource.
+
+Azure creates and manages the credentials automatically.
+
+No secrets or passwords are required.
+
+Example
+
+Without Managed Identity:
+
+VM
+ │
+ ▼
+Username
+Password
+
+Secrets must be stored and rotated.
+
+With Managed Identity:
+
+VM
+ │
+ ▼
+Managed Identity
+ │
+ ▼
+Azure Key Vault
+
+Azure handles authentication automatically.
+
+Types of Managed Identity
+1. System-Assigned
+
+Created automatically for one Azure resource.
+
+VM
+ │
+ ▼
+Managed Identity
+
+If the VM is deleted, the identity is deleted too.
+
+2. User-Assigned
+
+Created independently.
+
+Managed Identity
+     │
+ ┌───┴────┐
+ ▼        ▼
+VM1      VM2
+
+Can be shared by multiple Azure resources.
+
+Service Principal vs Managed Identity
+Service Principal	Managed Identity
+Used by external apps	Used by Azure resources
+You manage secrets/certificates (unless using workload identity/OIDC)	Azure manages credentials
+Works outside Azure	Azure resources only
+Common with GitHub Actions, Jenkins	Common with VMs, AKS, App Service
+Enterprise Example
+GitHub Actions
+      │
+      ▼
+Service Principal (or OIDC Workload Identity)
+      │
+      ▼
+Azure
+      │
+      ▼
+AKS
+
+AKS
+ │
+ ▼
+Managed Identity
+ │
+ ▼
+Azure Key Vault
+
+This is a common production setup.
+
+Managed Identity + Key Vault
+
+Instead of storing secrets:
+
+Database Password
+
+inside your application,
+
+the application:
+
+AKS Pod
+     │
+Managed Identity
+     │
+Azure Key Vault
+
+retrieves the secret securely at runtime.
+
+Hands-on Lab 4
+
+Enable System-Assigned Managed Identity on a VM.
+
+Portal:
+
+Virtual Machine
+     │
+Identity
+     │
+System Assigned
+     │
+On
+
+Save.
+
+Azure automatically creates the identity.
+
+Hands-on Lab 5
+
+Grant the VM access to Key Vault.
+
+Key Vault
+     │
+Access Control (IAM)
+     │
+Add Role Assignment
+
+Assign:
+
+Key Vault Secrets User
+
+(or the appropriate role for your access model)
+
+to the VM's managed identity.
+
+Authentication Decision Tree
+Is it an Azure Resource?
+
+        │
+   Yes──┴──No
+    │         │
+Managed     Service
+Identity   Principal
+
+Examples:
+
+Resource	Identity
+VM	Managed Identity
+AKS	Managed Identity
+App Service	Managed Identity
+GitHub Actions	Service Principal or OIDC
+Jenkins	Service Principal
+Interview Questions
+1. What is Microsoft Entra ID?
+
+Microsoft Entra ID is Azure's identity and access management service that manages users, groups, applications, and service identities.
+
+2. What is RBAC?
+
+RBAC controls what actions an identity can perform on Azure resources by assigning roles at different scopes.
+
+3. What is the difference between Authentication and Authorization?
+Authentication verifies identity ("Who are you?").
+Authorization determines permissions ("What can you do?").
+4. What is the difference between a Service Principal and a Managed Identity?
+
+Service Principal
+
+Identity for applications or external automation.
+Common for CI/CD systems like Jenkins or GitHub Actions (though GitHub OIDC is increasingly preferred).
+
+Managed Identity
+
+Identity for Azure resources.
+Azure automatically manages the credentials.
+5. Why is Managed Identity preferred?
+
+Because:
+
+No passwords or client secrets to store.
+Automatic credential rotation.
+Reduced security risk.
+Simpler operations.
+Real Project Scenario
+
+Question:
+
+Your AKS application needs to retrieve secrets from Azure Key Vault. How would you implement this securely?
+
+Answer:
+
+Enable a Managed Identity (or Azure AD Workload Identity) for the AKS workload.
+Grant the identity the required permissions on Azure Key Vault using RBAC or Key Vault access policies, depending on the configuration.
+The application authenticates using the managed identity and retrieves secrets without storing credentials in code or configuration.
+Hands-on Assignment
+
+Create or explore:
+
+Microsoft Entra ID
+Users
+Groups
+Role Assignments
+Service Principal
+System-Assigned Managed Identity
+
+Then answer:
+
+Why is Managed Identity more secure than storing passwords?
+When would you use a Service Principal?
+At which scopes can RBAC roles be assigned?
+Explain the difference between Authentication and Authorization.
+Which identity type would you choose for:
+GitHub Actions?
+AKS?
+Azure VM?
+Azure App Service?
+Key Takeaways
+Microsoft Entra ID manages identities.
+Authentication verifies identity; Authorization grants permissions.
+RBAC defines who can do what and where.
+Service Principals are identities for applications and automation.
+Managed Identities provide secure, passwordless authentication for Azure resources.
+Azure DevOps Update
+
+One important note based on current best practices:
+
+In modern Azure DevOps and GitHub Actions pipelines, OpenID Connect (OIDC) / Workload Identity Federation is increasingly replacing client-secret-based Service Principals. It allows GitHub Actions to authenticate to Azure without storing secrets. We'll cover this in detail during the GitHub Actions and Azure authentication modules, since it's the recommended production approach today.
