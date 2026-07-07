@@ -1,0 +1,570 @@
+Module 3 – Chapter 3: Git Workflow (Working Directory, Staging Area, Local Repository & Remote Repository)
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+Complete Git workflow
+Working Directory
+Staging Area (Index)
+Local Repository
+Remote Repository
+Git add
+Git commit
+Git push
+Git fetch
+Git pull
+Git status
+Git log
+Enterprise workflow
+Hands-on Labs
+The Complete Git Workflow
+
+This is the most important Git diagram.
+
+                    Developer
+                        │
+                Creates/Edits Files
+                        │
+                        ▼
+              Working Directory
+                        │
+                 git add
+                        ▼
+                Staging Area
+                        │
+               git commit
+                        ▼
+              Local Repository
+                        │
+                git push
+                        ▼
+            Remote Repository
+                 (GitHub/Azure Repos)
+
+Every Git command moves changes from one stage to the next.
+
+Step 1: Working Directory
+
+The Working Directory contains your project files.
+
+Example:
+
+project/
+
+README.md
+
+app.py
+
+Dockerfile
+
+main.tf
+
+When you edit a file:
+
+print("Hello Azure")
+
+Git notices the file has changed, but it isn't tracking the new change yet.
+
+Check Status
+git status
+
+Example:
+
+Modified:
+
+app.py
+
+The file is modified but unstaged.
+
+Step 2: Staging Area
+
+The Staging Area lets you decide which changes will be included in the next commit.
+
+Example:
+
+Modified files:
+
+README.md
+
+app.py
+
+Dockerfile
+
+Stage only one file:
+
+git add app.py
+
+Now:
+
+Working Directory
+
+README.md
+
+Dockerfile
+
+Staging Area
+
+app.py
+
+Only app.py will be committed.
+
+Stage Everything
+git add .
+
+Stages all modified and new files in the current directory.
+
+Why Do We Need a Staging Area?
+
+Imagine you've modified:
+
+README.md
+
+login.py
+
+payment.py
+
+You only finished login.py.
+
+Instead of committing everything:
+
+git add login.py
+git commit -m "Added login feature"
+
+The unfinished work stays out of the commit.
+
+This helps keep commits focused and easier to review.
+
+Step 3: Local Repository
+
+After staging:
+
+git commit -m "Added Login API"
+
+Git creates a commit in your local repository.
+
+Local Repository
+
+Commit A
+
+↓
+
+Commit B
+
+↓
+
+Commit C
+
+These commits exist only on your computer until you push them.
+
+Commit Structure
+
+Each commit contains:
+
+Commit ID (SHA)
+Author
+Date
+Commit Message
+Snapshot of files
+
+Example:
+
+Commit:
+7d8a9f3
+
+Message:
+Added Login Feature
+View Commit History
+git log
+
+Compact view:
+
+git log --oneline
+
+Example:
+
+a12bc34 Added Login
+
+8f9de12 Initial Commit
+Step 4: Remote Repository
+
+The remote repository is shared with your team.
+
+Examples:
+
+GitHub
+Azure Repos
+GitLab
+Bitbucket
+
+Push commits:
+
+git push origin main
+
+Now the team can see your changes.
+
+Complete Flow
+Edit File
+     │
+     ▼
+Working Directory
+     │
+git add
+     ▼
+Staging Area
+     │
+git commit
+     ▼
+Local Repository
+     │
+git push
+     ▼
+GitHub
+Git Fetch
+
+Suppose another developer pushes new commits.
+
+Your local repository doesn't know about them.
+
+Run:
+
+git fetch
+
+Git downloads the latest changes without modifying your working files.
+
+GitHub
+    │
+    ▼
+Local Repository
+
+No merge happens yet.
+
+Git Pull
+git pull
+
+This performs:
+
+git fetch
+
++
+
+git merge
+
+Your working directory is updated with the latest changes.
+
+Fetch vs Pull
+git fetch	git pull
+Downloads changes	Downloads and merges
+Safe	Changes working directory
+No merge	Merge happens automatically
+Git Status
+
+One of the most frequently used commands.
+
+git status
+
+Shows:
+
+Modified files
+Staged files
+Untracked files
+Current branch
+
+Example:
+
+On branch main
+
+Changes not staged:
+README.md
+
+Changes to be committed:
+app.py
+Git Log
+
+View commit history:
+
+git log
+
+Compact view:
+
+git log --oneline
+
+Graph view:
+
+git log --graph --oneline
+
+Very useful when working with branches.
+
+Enterprise Workflow
+
+Imagine your team has:
+
+10 Developers
+GitHub
+GitHub Actions
+AKS
+
+Workflow:
+
+Developer
+     │
+     ▼
+Feature Branch
+     │
+     ▼
+Commit
+     │
+     ▼
+Push
+     │
+     ▼
+Pull Request
+     │
+     ▼
+Code Review
+     │
+     ▼
+Merge to Main
+     │
+     ▼
+GitHub Actions
+     │
+     ▼
+Deploy to AKS
+
+This is the workflow used in many enterprise environments.
+
+Hands-on Lab 1
+
+Create a repository:
+
+mkdir git-workflow
+cd git-workflow
+git init
+Hands-on Lab 2
+
+Create a file:
+
+echo "Hello Git" > README.md
+
+Check:
+
+git status
+
+You should see:
+
+Untracked files:
+README.md
+Hands-on Lab 3
+
+Stage it:
+
+git add README.md
+
+Verify:
+
+git status
+
+Now it appears under:
+
+Changes to be committed
+Hands-on Lab 4
+
+Commit:
+
+git commit -m "Initial Commit"
+
+View history:
+
+git log
+Hands-on Lab 5
+
+Modify README:
+
+Hello Git
+
+Azure DevOps
+
+Check:
+
+git status
+
+You'll see:
+
+Modified:
+README.md
+Hands-on Lab 6
+
+Commit again:
+
+git add README.md
+
+git commit -m "Updated README"
+
+View:
+
+git log --oneline
+
+You'll now have two commits.
+
+Hands-on Lab 7
+
+Connect to GitHub:
+
+git remote add origin <repo-url>
+
+Push:
+
+git push -u origin main
+Hands-on Lab 8
+
+Simulate a fetch:
+
+Make a change in GitHub (edit README.md in the web UI).
+Save the change.
+Run:
+git fetch
+
+Then inspect:
+
+git log --oneline --all --graph
+
+Notice the remote has advanced, but your working directory hasn't changed yet.
+
+Now run:
+
+git pull
+
+Your local repository and working directory are updated.
+
+Real Azure DevOps Example
+
+Your GitHub Actions workflow:
+
+on:
+  push:
+    branches:
+      - main
+
+What triggers it?
+
+Developer
+
+↓
+
+git push
+
+↓
+
+GitHub
+
+↓
+
+GitHub Actions
+
+↓
+
+Terraform
+
+↓
+
+AKS Deployment
+
+The git push command starts the CI/CD pipeline.
+
+Common Mistakes
+Forgetting git add
+
+You edit a file and immediately run:
+
+git commit -m "Changes"
+
+Git responds:
+
+nothing to commit
+
+Because nothing was staged.
+
+Assuming git fetch updates files
+
+It doesn't.
+
+git fetch only downloads changes.
+
+To update your working files:
+
+git pull
+
+or merge manually after reviewing the fetched changes.
+
+Interview Questions
+1. Explain the Git workflow.
+
+Answer:
+
+Changes are made in the Working Directory, staged using git add, committed to the Local Repository with git commit, and shared with the team using git push to the Remote Repository.
+
+2. What is the difference between git fetch and git pull?
+git fetch	git pull
+Downloads remote changes	Downloads and integrates changes
+Doesn't modify working files	Updates the current branch
+Useful for reviewing changes	Convenient when you're ready to sync
+3. Why is the staging area important?
+
+It allows developers to choose exactly which changes should be included in the next commit, resulting in cleaner and more meaningful commit history.
+
+4. What happens when you run git push?
+
+Local commits are uploaded to the remote repository, making them available to other team members and potentially triggering CI/CD pipelines.
+
+5. What command do you use most often?
+
+In day-to-day development:
+
+git status
+
+because it quickly shows the current state of your repository.
+
+Assignment
+
+Practice the complete workflow:
+
+git init
+git status
+git add .
+git commit -m "First Commit"
+git log --oneline
+git remote add origin <repo-url>
+git push -u origin main
+git fetch
+git pull
+
+Then answer:
+
+What is the difference between the Working Directory and the Staging Area?
+Why doesn't git fetch change your local files?
+What does git pull do internally?
+Why do we commit locally before pushing?
+Which Git command triggers your GitHub Actions workflow?
+Chapter Summary
+Create File
+     │
+     ▼
+Working Directory
+     │
+git add
+     ▼
+Staging Area
+     │
+git commit
+     ▼
+Local Repository
+     │
+git push
+     ▼
+Remote Repository
+     │
+GitHub Actions
+     │
+Azure Deployment
+
+If you understand this flow, you've mastered the core Git lifecycle.

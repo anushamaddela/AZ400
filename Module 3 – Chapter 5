@@ -1,0 +1,482 @@
+Module 3 – Chapter 5: Git Branching & Branching Strategies
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is a Branch?
+Why branches are used
+git branch
+git checkout
+git switch
+Create/Delete branches
+Merge branches
+Merge conflicts
+GitFlow
+GitHub Flow
+Trunk-Based Development
+Enterprise branching strategies
+Hands-on Labs
+What is a Branch?
+
+A branch is an independent line of development.
+
+It allows developers to work on new features or bug fixes without affecting the main codebase.
+
+Imagine the main branch is the production highway:
+
+main
+ │
+ │
+ │
+ └────────────► Production
+
+A developer creates a new feature:
+
+main
+ │
+ ├──────── feature-login
+ │
+ └────────► Production
+
+The feature branch is isolated until it's ready.
+
+Why Do We Need Branches?
+
+Without branches:
+
+Developer A
+        │
+Developer B
+        │
+Developer C
+        │
+        ▼
+main
+
+Everyone changes the same branch, increasing the risk of broken builds and conflicts.
+
+With branches:
+
+main
+ │
+ ├── feature-login
+ ├── feature-payment
+ └── bugfix-auth
+
+Each developer works independently.
+
+Create a Branch
+
+List branches:
+
+git branch
+
+Create:
+
+git branch feature-login
+
+Nothing changes yet—you've only created the branch.
+
+Switch to a Branch
+
+Older command:
+
+git checkout feature-login
+
+Modern command (recommended):
+
+git switch feature-login
+Create and Switch
+git switch -c feature-login
+
+Equivalent to:
+
+git branch feature-login
+git switch feature-login
+Verify Current Branch
+git branch
+
+Example:
+
+* feature-login
+  main
+
+The * indicates the active branch.
+
+Branch Workflow
+main
+ │
+ ├───── feature-login
+ │         │
+ │         │ Commit
+ │         │ Commit
+ │         ▼
+ └──────── Merge
+Commit on a Branch
+git switch feature-login
+
+git add .
+
+git commit -m "Added login page"
+
+Only feature-login contains these commits.
+
+Merge a Branch
+
+Switch back to main:
+
+git switch main
+
+Merge:
+
+git merge feature-login
+
+Result:
+
+main
+ │
+ ├──── feature-login
+ │
+ ▼
+Merged
+Delete a Branch
+
+After merging:
+
+git branch -d feature-login
+
+Force delete (use carefully):
+
+git branch -D feature-login
+Merge Conflict
+
+A merge conflict occurs when two branches modify the same part of the same file.
+
+Example:
+
+main
+print("Version A")
+feature-login
+print("Version B")
+
+Git cannot decide which version to keep.
+
+It reports:
+
+CONFLICT (content): Merge conflict
+Conflict Markers
+<<<<<<< HEAD
+Version A
+=======
+Version B
+>>>>>>> feature-login
+
+You manually edit the file:
+
+print("Version B")
+
+or combine both changes if appropriate.
+
+Then:
+
+git add app.py
+git commit
+Local Branch vs Remote Branch
+
+Local:
+
+Your Laptop
+ │
+ ├── main
+ └── feature-login
+
+Remote:
+
+GitHub
+ │
+ ├── main
+ └── feature-login
+
+Push a branch:
+
+git push origin feature-login
+Branching Strategies
+
+There are three major strategies used in the industry.
+
+1. GitHub Flow ⭐
+
+Simple and widely used.
+
+main
+ │
+ ├── feature-login
+ │       │
+ │       ▼
+ │   Pull Request
+ │
+ ▼
+Merge
+
+Steps:
+
+Create a feature branch.
+Commit changes.
+Push to GitHub.
+Open a Pull Request.
+Code review.
+Merge into main.
+CI/CD deploys.
+
+Best for:
+
+SaaS
+Cloud-native applications
+Continuous deployment
+2. GitFlow
+
+More structured.
+
+main
+ │
+ ├── develop
+ │      │
+ │      ├── feature/*
+ │      ├── release/*
+ │      └── hotfix/*
+
+Branches:
+
+Branch	Purpose
+main	Production
+develop	Integration
+feature	New features
+release	Release preparation
+hotfix	Urgent production fixes
+
+Best for:
+
+Large teams
+Scheduled releases
+3. Trunk-Based Development
+
+Everything integrates into a single main branch frequently.
+
+main
+ │
+ ├─ small feature
+ ├─ small fix
+ ├─ enhancement
+
+Developers create short-lived branches and merge quickly.
+
+Best for:
+
+High-frequency deployments
+CI/CD-heavy organizations
+Which Strategy Should You Choose?
+Team Type	Recommended Strategy
+Startup	GitHub Flow
+Enterprise SaaS	GitHub Flow or Trunk-Based
+Banking	GitFlow
+Government	GitFlow
+Frequent Releases	Trunk-Based
+Enterprise Azure DevOps Workflow
+Developer
+      │
+      ▼
+Feature Branch
+      │
+      ▼
+Push
+      │
+      ▼
+Pull Request
+      │
+      ▼
+Code Review
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+Merge to main
+      │
+      ▼
+Deploy to AKS
+
+This is the workflow you've been building throughout the course.
+
+Hands-on Lab 1
+
+Create a repository:
+
+mkdir branching-demo
+cd branching-demo
+git init
+
+Create an initial commit.
+
+Hands-on Lab 2
+
+Create a branch:
+
+git switch -c feature-login
+
+Check:
+
+git branch
+Hands-on Lab 3
+
+Modify:
+
+README.md
+
+Commit:
+
+git add .
+git commit -m "Added login feature"
+Hands-on Lab 4
+
+Switch:
+
+git switch main
+
+Merge:
+
+git merge feature-login
+Hands-on Lab 5
+
+Delete:
+
+git branch -d feature-login
+Hands-on Lab 6
+
+Create two branches:
+
+git switch -c feature-payment
+git switch -c feature-profile
+
+Practice switching:
+
+git switch feature-payment
+git switch feature-profile
+Hands-on Lab 7 (Merge Conflict)
+Modify the same line in README.md on main.
+Modify the same line differently on feature-payment.
+Merge.
+Resolve the conflict.
+Commit the resolution.
+
+This is a common real-world scenario.
+
+Branch Protection (Enterprise)
+
+In production projects, main is usually protected.
+
+Rules often include:
+
+No direct pushes
+Pull Request required
+At least 2 reviewers
+CI pipeline must pass
+Status checks required
+
+GitHub Branch Protection Rules enforce these policies.
+
+Interview Questions
+1. What is a Git branch?
+
+A branch is an independent line of development that allows developers to work on changes without affecting the main branch.
+
+2. What is the difference between git branch and git switch?
+git branch creates or lists branches.
+git switch changes the active branch.
+3. What is a merge conflict?
+
+A merge conflict occurs when Git cannot automatically combine changes because the same part of a file was modified differently in different branches.
+
+4. Which branching strategy have you used?
+
+For a modern Azure DevOps project, a strong answer is:
+
+"We use GitHub Flow. Developers create feature branches, open Pull Requests, complete code reviews, ensure CI checks pass, and then merge into the protected main branch."
+
+5. Why protect the main branch?
+
+To:
+
+Prevent accidental direct commits
+Enforce code reviews
+Ensure CI/CD validation
+Maintain production stability
+Real Interview Scenario
+
+Question:
+
+Two developers modified the same file. Git reports a merge conflict. What would you do?
+
+Answer:
+
+Review the conflicting sections.
+Decide which changes to keep (or combine both if appropriate).
+Edit the file to resolve the conflict.
+
+Run:
+
+git add <file>
+git commit
+Verify the application still builds and passes tests before pushing.
+Assignment
+
+Practice:
+
+git branch
+git switch -c feature-login
+git switch main
+git merge feature-login
+git branch -d feature-login
+git push origin feature-login
+
+Create:
+
+feature-login
+feature-payment
+bugfix-auth
+
+Merge them into main one by one and intentionally create at least one merge conflict to practice resolving it.
+
+Key Takeaways
+Branches isolate development work.
+Use feature branches for new development.
+Merge only after testing and review.
+Protect the main branch in production repositories.
+Choose a branching strategy that fits your team's release process.
+🏢 Enterprise Best Practice
+
+For most modern Azure DevOps/GitHub projects, a practical workflow is:
+
+main (Protected)
+      │
+      ▼
+feature/azure-keyvault
+      │
+      ▼
+Pull Request
+      │
+      ▼
+Code Review
+      │
+      ▼
+GitHub Actions (Build + Tests + Security Scan)
+      │
+      ▼
+Merge
+      │
+      ▼
+Deploy
+
+This is the workflow used by many organizations deploying continuously to Azure.
+
+Next Chapter
+

@@ -1,0 +1,451 @@
+Module 3 – Chapter 1: Git Architecture & Internal Working
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is Git?
+Why Git is needed
+Git Architecture
+Git Workflow
+Local Repository vs Remote Repository
+Git Objects
+SHA Hash
+Git Internals
+Hands-on Labs
+What is Git?
+
+Git is a Distributed Version Control System (DVCS) used to track changes in source code and enable collaboration among multiple developers.
+
+Git helps you:
+
+Track code history
+Collaborate safely
+Revert changes
+Create branches
+Merge features
+Support CI/CD pipelines
+Why Do We Need Git?
+
+Imagine three developers editing the same file.
+
+Without Git:
+
+Developer A
+
+main.py
+Developer B
+
+main.py
+Developer C
+
+main.py
+
+Problems:
+
+File overwrites
+No version history
+Difficult collaboration
+No rollback
+
+With Git:
+
+Developer A
+      │
+Developer B
+      │
+Developer C
+      │
+      ▼
+Git Repository
+
+Every change is tracked.
+
+What is Version Control?
+
+Version Control records every change made to files over time.
+
+Example:
+
+Version 1
+Login Page
+
+↓
+
+Version 2
+Google Login
+
+↓
+
+Version 3
+Forgot Password
+
+Git lets you move between versions if needed.
+
+Centralized vs Distributed Version Control
+Centralized Version Control (CVCS)
+
+Example: SVN
+
+Developer
+      │
+Developer
+      │
+Developer
+      │
+      ▼
+Central Server
+
+Problem:
+
+If the central server fails, work is disrupted.
+
+Distributed Version Control (DVCS)
+
+Git
+
+Developer A
+     │
+Local Repository
+     │
+───────────────
+
+Developer B
+     │
+Local Repository
+     │
+───────────────
+
+Remote Repository
+
+Each developer has a complete copy of the repository, including its history.
+
+Git Architecture
+
+Git has four main areas.
+
+Working Directory
+        │
+git add
+        ▼
+Staging Area
+        │
+git commit
+        ▼
+Local Repository
+        │
+git push
+        ▼
+Remote Repository
+
+This diagram is the most important Git diagram to remember.
+
+1. Working Directory
+
+This is where you create or modify files.
+
+Example:
+
+main.py
+Dockerfile
+README.md
+
+Nothing is tracked until you stage changes.
+
+2. Staging Area (Index)
+
+The staging area lets you choose exactly what will be included in the next commit.
+
+Example:
+
+Modified files:
+
+app.py
+README.md
+
+Stage only:
+
+git add app.py
+
+Only app.py is prepared for commit.
+
+3. Local Repository
+
+When you run:
+
+git commit -m "Added login feature"
+
+Git stores a snapshot in your local repository.
+
+This commit exists only on your machine until you push it.
+
+4. Remote Repository
+
+The remote repository is hosted on platforms like:
+
+GitHub
+Azure Repos
+GitLab
+Bitbucket
+
+Sharing happens when you push your commits.
+
+Git Workflow
+Developer
+      │
+      ▼
+Create File
+      │
+git add
+      ▼
+Staging Area
+      │
+git commit
+      ▼
+Local Repository
+      │
+git push
+      ▼
+GitHub
+Git Objects
+
+Internally, Git stores four object types.
+
+Object	Purpose
+Blob	File contents
+Tree	Directory structure
+Commit	Snapshot with metadata
+Tag	Named reference to a commit
+Blob
+
+Stores file contents.
+
+Example:
+
+README.md
+
+↓
+
+Blob Object
+
+Tree
+
+Represents folders.
+
+project/
+
+README.md
+
+Dockerfile
+
+src/
+
+The tree links files and directories together.
+
+Commit
+
+A commit stores:
+
+Author
+Timestamp
+Commit message
+Parent commit
+Tree reference
+
+Example:
+
+Added Login API
+
+Each commit represents a snapshot of the project.
+
+Tag
+
+A tag marks an important commit.
+
+Example:
+
+v1.0
+
+v2.0
+
+v3.0
+
+Used for releases.
+
+SHA-1 Hash
+
+Every Git object has a unique hash.
+
+Example:
+
+c9b1d7e8f234...
+
+Git uses these hashes to identify commits and objects.
+
+Benefits:
+
+Integrity
+Uniqueness
+Easy referencing
+Local vs Remote Repository
+Local	Remote
+On your machine	GitHub / Azure Repos
+Personal work	Shared collaboration
+Commit locally	Push to share
+Git in Azure DevOps
+
+Example:
+
+Developer
+      │
+      ▼
+GitHub Repository
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+Terraform
+      │
+      ▼
+Azure
+
+Git is the trigger for your CI/CD pipeline.
+
+Hands-on Lab 1: Install Git
+Windows
+
+Download Git from the official website:
+
+Git for Windows
+
+Verify:
+
+git --version
+Hands-on Lab 2: Configure Git
+git config --global user.name "Anusha"
+git config --global user.email "your-email@example.com"
+
+Check configuration:
+
+git config --list
+Hands-on Lab 3: Create Your First Repository
+mkdir git-demo
+cd git-demo
+
+Initialize Git:
+
+git init
+
+Expected output:
+
+Initialized empty Git repository
+Hands-on Lab 4: Create First File
+echo "Hello Azure DevOps" > README.md
+
+Check status:
+
+git status
+
+You'll see:
+
+Untracked files:
+README.md
+Hands-on Lab 5: Stage the File
+git add README.md
+
+Check status again:
+
+git status
+
+Now it should appear under Changes to be committed.
+
+Hands-on Lab 6: Commit
+git commit -m "Initial Commit"
+
+View history:
+
+git log
+
+You'll see your first commit with its SHA hash.
+
+Hands-on Lab 7: Create a GitHub Repository
+Create a new repository in GitHub.
+Do not initialize it with a README.
+Connect your local repository:
+git remote add origin <repository-url>
+
+Verify:
+
+git remote -v
+
+Push:
+
+git branch -M main
+git push -u origin main
+Real Enterprise Flow
+Developer
+      │
+      ▼
+Working Directory
+      │
+git add
+      ▼
+Staging Area
+      │
+git commit
+      ▼
+Local Repository
+      │
+git push
+      ▼
+GitHub
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+AKS Deployment
+
+This is the same flow you've been building in your Azure DevOps project.
+
+Interview Questions
+1. What is Git?
+
+Git is a distributed version control system that tracks code changes and enables collaboration.
+
+2. What is the difference between Git and GitHub?
+Git	GitHub
+Version control software	Cloud hosting platform for Git repositories
+Installed locally	Hosted online
+3. What is the staging area?
+
+The staging area is an intermediate area where selected changes are prepared before creating a commit.
+
+4. What is a commit?
+
+A commit is a snapshot of the project's state at a specific point in time, along with metadata such as the author and commit message.
+
+5. What is the difference between a local and remote repository?
+
+A local repository exists on your machine and contains your work and history. A remote repository is shared with the team through platforms like GitHub or Azure Repos.
+
+Assignment
+Install Git.
+Configure your username and email.
+Create a local Git repository.
+Add a README.md file.
+Stage and commit the file.
+Create a GitHub repository and push your commit.
+Run:
+git status
+git log
+git config --list
+git remote -v
+Key Takeaways
+Git is a Distributed Version Control System.
+The Git workflow is:
+Working Directory → Staging Area → Local Repository → Remote Repository.
+Every commit is identified by a unique SHA hash.
+Commits remain local until you push them.
+Git is the starting point for every modern CI/CD pipeline.
+Next Chapter

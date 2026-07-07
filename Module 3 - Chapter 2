@@ -1,0 +1,385 @@
+Module 3 – Chapter 2: Installing Git & Git Configuration (Deep Dive)
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+Installing Git
+Git Configuration
+Global vs Local Configuration
+System Configuration
+SSH vs HTTPS
+Personal Access Token (PAT)
+SSH Key Authentication
+Enterprise Best Practices
+Hands-on Labs
+Git Installation
+Windows
+
+Download Git:
+
+Git Downloads
+
+Verify:
+
+git --version
+
+Example:
+
+git version 2.50.1
+Linux (Ubuntu)
+sudo apt update
+sudo apt install git -y
+Linux (RHEL/CentOS/Rocky)
+sudo dnf install git -y
+macOS
+brew install git
+Verify Installation
+git --version
+Git Configuration Levels
+
+Git has three configuration levels.
+
+System
+   │
+Global
+   │
+Local
+
+Priority:
+
+Local
+   ↓
+Global
+   ↓
+System
+
+The Local configuration overrides the others.
+
+1. System Configuration
+
+Applies to every user on the machine.
+
+View:
+
+git config --system --list
+
+Requires administrator privileges to modify.
+
+2. Global Configuration
+
+Applies to the current user.
+
+Set username:
+
+git config --global user.name "Anusha"
+
+Set email:
+
+git config --global user.email "anusha@example.com"
+
+Verify:
+
+git config --global --list
+3. Local Configuration
+
+Applies only to one repository.
+
+git config --local user.name "ProjectUser"
+
+Check:
+
+git config --local --list
+Check All Configuration
+git config --list
+
+Example:
+
+user.name=Anusha
+user.email=anusha@example.com
+core.editor=code
+init.defaultBranch=main
+Useful Git Configuration
+
+Set VS Code as default editor:
+
+git config --global core.editor "code --wait"
+
+Set default branch:
+
+git config --global init.defaultBranch main
+
+Enable colored output:
+
+git config --global color.ui auto
+Authentication Methods
+
+Git supports two common authentication methods.
+
+GitHub
+
+├── HTTPS
+└── SSH
+HTTPS Authentication
+
+Example repository:
+
+https://github.com/company/project.git
+
+Authentication uses:
+
+Username
+Personal Access Token (PAT)
+
+GitHub no longer supports password authentication for Git operations.
+
+Personal Access Token (PAT)
+
+A PAT is a secure token that replaces your GitHub password for Git operations over HTTPS.
+
+Example:
+
+ghp_xxxxxxxxxxxxxxxxx
+Create a PAT
+
+On GitHub:
+
+Profile
+Settings
+Developer settings
+Personal access tokens
+Generate new token
+
+Choose appropriate scopes (follow the principle of least privilege).
+
+Clone Using HTTPS
+git clone https://github.com/company/project.git
+
+Git prompts for:
+
+Username
+
+PAT
+SSH Authentication
+
+Instead of using a PAT every time:
+
+Developer
+
+↓
+
+SSH Key
+
+↓
+
+GitHub
+
+Authentication happens using a key pair.
+
+Why SSH?
+
+Advantages:
+
+More secure
+No repeated token prompts
+Widely used in enterprise environments
+Generate SSH Key
+ssh-keygen -t ed25519 -C "anusha@example.com"
+
+Press Enter for default location.
+
+Generated files:
+
+~/.ssh/id_ed25519
+
+~/.ssh/id_ed25519.pub
+Public vs Private Key
+Public Key	Private Key
+Shared with GitHub	Never shared
+Ends with .pub	Keep secret
+Add SSH Key to GitHub
+
+Display the public key:
+
+cat ~/.ssh/id_ed25519.pub
+
+Copy the output.
+
+GitHub:
+
+Settings
+SSH and GPG Keys
+New SSH Key
+Paste the public key
+Test SSH Connection
+ssh -T git@github.com
+
+Expected:
+
+Hi username! You've successfully authenticated...
+Clone Using SSH
+git clone git@github.com:company/project.git
+
+No PAT prompt.
+
+SSH vs HTTPS
+SSH	HTTPS
+Uses key pair	Uses PAT
+No repeated authentication	Token may be prompted
+Preferred for developers	Common in automation or restrictive environments
+Git Credential Manager
+
+Git Credential Manager securely stores credentials.
+
+Windows:
+
+git config --global credential.helper manager
+
+Linux:
+
+git config --global credential.helper cache
+Enterprise Authentication
+
+Developers
+
+SSH Keys
+
+CI/CD Systems
+
+GitHub App
+
+or
+
+Deploy Key
+
+or
+
+PAT (only if required)
+
+Azure Repos
+
+Microsoft Entra ID
+GitHub Authentication in GitHub Actions
+
+Modern GitHub Actions uses:
+
+GitHub Token
+
+↓
+
+Repository Access
+
+Azure authentication:
+
+OIDC
+
+↓
+
+Azure
+
+No Azure client secrets are required when using workload identity federation.
+
+Hands-on Lab 1
+
+Verify Git:
+
+git --version
+Hands-on Lab 2
+
+Configure:
+
+git config --global user.name "Anusha"
+git config --global user.email "anusha@example.com"
+
+Verify:
+
+git config --global --list
+Hands-on Lab 3
+
+Generate SSH Key:
+
+ssh-keygen -t ed25519 -C "anusha@example.com"
+Hands-on Lab 4
+
+Display Public Key:
+
+cat ~/.ssh/id_ed25519.pub
+
+Add it to GitHub.
+
+Hands-on Lab 5
+
+Test SSH:
+
+ssh -T git@github.com
+Hands-on Lab 6
+
+Clone Using SSH:
+
+git clone git@github.com:<your-username>/<repository>.git
+Enterprise Workflow
+Developer
+      │
+      ▼
+SSH Authentication
+      │
+      ▼
+GitHub Repository
+      │
+      ▼
+Push Code
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+Azure
+Interview Questions
+1. What are the three Git configuration levels?
+System
+Global
+Local
+2. What is a Personal Access Token?
+
+A Personal Access Token is a secure credential used instead of a password for Git operations over HTTPS.
+
+3. Which is better: SSH or HTTPS?
+
+For developers, SSH is commonly preferred because it avoids repeated authentication and uses asymmetric keys. HTTPS with PATs is also widely supported and may be preferred in some environments depending on organizational policy.
+
+4. What is the difference between a public key and a private key?
+Public Key	Private Key
+Shared with Git server	Never shared
+Used to identify you	Used to authenticate you
+5. How do GitHub Actions authenticate to Azure?
+
+The recommended approach is OIDC (OpenID Connect) Workload Identity Federation, which allows GitHub Actions to authenticate without storing Azure client secrets.
+
+Real Interview Scenario
+
+Question:
+
+A developer is prompted for credentials every time they push to GitHub. How would you solve it?
+
+Answer:
+
+I would first determine whether they're using HTTPS or SSH:
+
+If HTTPS, configure Git Credential Manager or use a properly scoped Personal Access Token.
+If SSH is allowed, generate an SSH key pair, add the public key to GitHub, verify the connection with ssh -T git@github.com, and use the repository's SSH URL.
+Hands-on Assignment
+Install Git.
+Configure global username and email.
+Generate an SSH key pair.
+Add the public key to GitHub.
+Test SSH authentication.
+Clone a repository using SSH.
+Run:
+git config --list
+git remote -v
+ssh -T git@github.com
+Key Takeaways
+Git has System, Global, and Local configuration levels.
+HTTPS authentication uses Personal Access Tokens instead of passwords.
+SSH authentication uses a public/private key pair.
+Never share your private SSH key.
+Modern GitHub-to-Azure authentication should use OIDC instead of long-lived client secrets.

@@ -1,0 +1,456 @@
+Module 3 – Chapter 6: Merge vs Rebase
+Learning Objectives
+
+By the end of this chapter, you'll understand:
+
+What is git merge?
+What is git rebase?
+Merge Commit
+Fast-Forward Merge
+Three-Way Merge
+Interactive Rebase
+Squashing Commits
+Merge vs Rebase
+Enterprise Best Practices
+Hands-on Labs
+The Initial Repository
+
+Suppose your repository starts like this:
+
+A ---- B ---- C  (main)
+
+Now you create a feature branch.
+
+                D ---- E  (feature-login)
+               /
+A ---- B ---- C  (main)
+
+Meanwhile another developer commits to main.
+
+                D ---- E  (feature-login)
+               /
+A ---- B ---- C ---- F  (main)
+
+Your branch is now behind main.
+
+Option 1: Git Merge
+
+Command:
+
+git switch main
+git merge feature-login
+
+Result:
+
+                D ---- E
+               /        \
+A ---- B ---- C ---- F ---- M
+
+M is the Merge Commit.
+
+Git preserves the exact history of both branches.
+
+What Happens Internally?
+
+Git combines:
+
+Feature branch commits
+Main branch commits
+
+into one new merge commit.
+
+Advantages:
+
+Complete history preserved
+Easy to understand branch history
+
+Disadvantages:
+
+More merge commits
+History can become cluttered
+Fast-Forward Merge
+
+Suppose nobody changed main.
+
+A ---- B ---- C  (main)
+                \
+                 D ---- E
+
+Run:
+
+git merge feature-login
+
+Git simply moves main forward.
+
+A ---- B ---- C ---- D ---- E
+
+No merge commit is created.
+
+Three-Way Merge
+
+If both branches changed:
+
+                D ---- E
+               /
+A ---- B ---- C ---- F
+
+Git creates:
+
+                D ---- E
+               /        \
+A ---- B ---- C ---- F ---- M
+
+This is called a Three-Way Merge because Git compares:
+
+Common ancestor
+Main branch
+Feature branch
+Option 2: Git Rebase
+
+Instead of merging:
+
+git switch feature-login
+git rebase main
+
+Git replays your commits on top of the latest main.
+
+Before:
+
+                D ---- E
+               /
+A ---- B ---- C ---- F
+
+After:
+
+A ---- B ---- C ---- F ---- D' ---- E'
+
+D' and E' are new commits with new commit hashes.
+
+No merge commit.
+
+Why Does Rebase Change Commit IDs?
+
+Each Git commit contains:
+
+Parent commit
+Timestamp
+Metadata
+SHA hash
+
+When Git changes the parent commit during a rebase, it creates a new commit with a new SHA.
+
+Merge vs Rebase
+Merge History
+                D ---- E
+               /        \
+A ---- B ---- C ---- F ---- M
+
+Complete branch history.
+
+Rebase History
+A ---- B ---- C ---- F ---- D' ---- E'
+
+Linear history.
+
+Comparison
+Merge	Rebase
+Preserves branch history	Creates linear history
+Merge commit may be created	No merge commit
+Safer for shared branches	Best before sharing or on local branches
+Easier to audit	Cleaner commit history
+Interactive Rebase
+
+Command:
+
+git rebase -i HEAD~3
+
+Git opens an editor:
+
+pick a1 First Commit
+pick b2 Second Commit
+pick c3 Third Commit
+
+You can:
+
+Reorder commits
+Edit commit messages
+Squash commits
+Drop commits
+Squash Commits
+
+Suppose you have:
+
+Added Login
+
+Fixed Login
+
+Updated Login
+
+Removed Debug
+
+Instead of four commits:
+
+A
+B
+C
+D
+
+Use interactive rebase:
+
+git rebase -i HEAD~4
+
+Change:
+
+pick A
+squash B
+squash C
+squash D
+
+Result:
+
+Single Commit
+
+"Implemented Login Feature"
+
+This produces a much cleaner history.
+
+Rebase Conflict
+
+Conflicts can also happen during a rebase.
+
+Git pauses:
+
+CONFLICT
+
+Steps:
+
+Resolve the file.
+
+Stage it:
+
+git add app.py
+
+Continue:
+
+git rebase --continue
+
+Abort if needed:
+
+git rebase --abort
+Enterprise Example
+
+Developer creates:
+
+feature-payment
+
+Commits:
+
+Commit 1
+
+Commit 2
+
+Commit 3
+
+Before opening the Pull Request:
+
+git fetch origin
+git rebase origin/main
+
+Resolve conflicts.
+
+Push:
+
+git push --force-with-lease
+
+Why --force-with-lease instead of --force?
+
+After a rebase, commit history changes, so a force push is required. --force-with-lease is safer because it refuses to overwrite remote changes made by others.
+
+Merge in GitHub
+
+Most repositories use Pull Requests.
+
+Options include:
+
+Create a merge commit
+Squash and merge
+Rebase and merge
+
+Each organization chooses a strategy based on its workflow.
+
+Which Should You Use?
+Scenario	Recommended
+Shared branch	Merge
+Local feature branch before PR	Rebase
+Clean history	Rebase
+Preserve history	Merge
+Production releases	Usually Merge (depends on team policy)
+Hands-on Lab 1
+
+Create:
+
+git switch -c feature-login
+
+Add:
+
+login.py
+
+Commit twice.
+
+Hands-on Lab 2
+
+Switch:
+
+git switch main
+
+Add another commit.
+
+Now your history has diverged.
+
+Hands-on Lab 3
+
+Merge:
+
+git merge feature-login
+
+View history:
+
+git log --graph --oneline
+
+Observe the merge commit.
+
+Hands-on Lab 4
+
+Reset to a clean state (or use a fresh repository).
+
+Recreate the scenario.
+
+Run:
+
+git switch feature-login
+git rebase main
+
+View:
+
+git log --graph --oneline
+
+Notice the linear history.
+
+Hands-on Lab 5
+
+Interactive rebase:
+
+git rebase -i HEAD~3
+
+Squash the last three commits into one.
+
+Hands-on Lab 6
+
+Create a rebase conflict:
+
+Modify the same line on main.
+Modify it differently on feature-login.
+Rebase.
+Resolve the conflict.
+Continue:
+git rebase --continue
+Enterprise Workflow
+Developer
+     │
+Feature Branch
+     │
+git fetch
+     │
+git rebase origin/main
+     │
+Resolve Conflicts
+     │
+Push (force-with-lease if required)
+     │
+Pull Request
+     │
+Code Review
+     │
+Merge
+     │
+GitHub Actions
+     │
+Deploy
+Interview Questions
+1. What is the difference between Merge and Rebase?
+
+Merge
+
+Combines histories.
+May create a merge commit.
+
+Rebase
+
+Replays commits on top of another branch.
+Produces a linear history.
+2. Does Rebase change commit IDs?
+
+Yes. Rebase creates new commits with new parent relationships, so the commit hashes change.
+
+3. When should you avoid Rebase?
+
+Avoid rebasing shared branches that other developers are already using, because rewriting history can disrupt their work.
+
+4. What is Squashing?
+
+Squashing combines multiple commits into a single, cleaner commit.
+
+5. Which strategy do enterprise projects commonly use?
+
+A common pattern is:
+
+Developers rebase their local feature branches before opening a Pull Request (or simply keep them updated).
+The Pull Request is merged according to the repository policy (merge commit, squash merge, or rebase merge).
+
+The exact strategy varies by organization.
+
+Real Interview Scenario
+
+Question:
+
+Your feature branch is 50 commits behind main. What would you do?
+
+Answer:
+
+Fetch the latest changes:
+
+git fetch origin
+
+Update the feature branch:
+
+git rebase origin/main
+
+(or merge origin/main if that is the team's standard practice)
+
+Resolve any conflicts.
+Run tests.
+Push the updated branch (using --force-with-lease only if a rebase changed published commits and team policy allows it).
+Assignment
+
+Practice:
+
+git merge
+git rebase
+git rebase -i HEAD~3
+git rebase --continue
+git rebase --abort
+git log --graph --oneline
+
+Then answer:
+
+Why does git rebase create new commit hashes?
+When is a merge commit created?
+What is a fast-forward merge?
+Why is --force-with-lease safer than --force after a rebase?
+When would you choose merge instead of rebase?
+Key Takeaways
+Merge preserves branch history and is safe for shared branches.
+Rebase creates a cleaner, linear history by replaying commits.
+Interactive rebase lets you reorder, edit, or squash commits.
+Avoid rebasing branches that others are actively using.
+Follow your team's branching and merge policy rather than using one approach everywhere.

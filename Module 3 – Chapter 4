@@ -1,0 +1,498 @@
+Module 3 – Chapter 4: Git Commands (Complete Deep Dive)
+Learning Objectives
+
+By the end of this chapter, you'll know:
+
+Repository commands
+Tracking file changes
+Staging & committing
+Viewing history
+Comparing changes
+Removing and restoring files
+Working with remotes
+Enterprise Git workflow
+Hands-on labs
+Git Command Categories
+Category	Commands
+Repository	git init, git clone
+Status	git status, git diff
+Staging	git add, git restore --staged
+Commit	git commit, git log, git show
+File Management	git rm, git mv, git restore, git clean
+Remote	git remote, git fetch, git pull, git push
+1. git init
+
+Creates a new Git repository.
+
+mkdir demo
+cd demo
+git init
+
+Output:
+
+Initialized empty Git repository
+
+Git creates a hidden .git directory.
+
+Verify:
+
+ls -la
+
+You'll see:
+
+.git
+2. git clone
+
+Copies an existing remote repository.
+
+git clone https://github.com/user/project.git
+
+or
+
+git clone git@github.com:user/project.git
+
+Creates:
+
+project/
+├── .git
+├── README.md
+└── src/
+3. git status ⭐
+
+The most frequently used command.
+
+git status
+
+Shows:
+
+Current branch
+Modified files
+Staged files
+Untracked files
+
+Example:
+
+On branch main
+
+Changes not staged:
+README.md
+
+Untracked files:
+notes.txt
+
+Use it before almost every Git operation.
+
+4. git add
+
+Moves changes to the staging area.
+
+Single file:
+
+git add app.py
+
+Multiple files:
+
+git add app.py README.md
+
+Everything:
+
+git add .
+5. git commit
+
+Creates a snapshot.
+
+git commit -m "Added login feature"
+
+Best practices:
+
+✅ Small commits
+
+✅ Clear messages
+
+Examples:
+
+Fix login bug
+
+Add payment API
+
+Update Terraform module
+
+Avoid:
+
+Changes
+
+Update
+
+Fixed stuff
+6. git log
+
+Shows commit history.
+
+git log
+
+Compact:
+
+git log --oneline
+
+Graph:
+
+git log --graph --oneline
+
+Example:
+
+* a123456 Added login
+* b987654 Initial commit
+7. git show
+
+Displays detailed information about a commit.
+
+git show
+
+Specific commit:
+
+git show a123456
+
+Shows:
+
+Commit message
+Author
+Date
+File changes
+8. git diff
+
+Shows changes before committing.
+
+Example:
+
+print("Hello")
+
+Modified:
+
+print("Hello Azure")
+
+Run:
+
+git diff
+
+Git highlights the exact changes.
+
+Compare staged changes
+git diff --staged
+
+Useful before committing.
+
+9. git rm
+
+Removes a file and stages the deletion.
+
+git rm old.txt
+
+Commit:
+
+git commit -m "Removed old file"
+Keep the local file but remove it from Git
+git rm --cached secrets.txt
+
+Very useful when you accidentally commit:
+
+.env
+terraform.tfvars
+config.json
+10. git mv
+
+Rename a file.
+
+Instead of:
+
+mv app.py main.py
+
+Use:
+
+git mv app.py main.py
+
+Git tracks the rename properly.
+
+11. git restore
+
+Discard local changes.
+
+git restore app.py
+
+Returns the file to the last committed state.
+
+⚠️ Local uncommitted changes will be lost.
+
+Unstage a file
+git restore --staged app.py
+
+Removes it from the staging area while keeping your changes.
+
+12. git clean
+
+Remove untracked files.
+
+Preview first:
+
+git clean -n
+
+Delete:
+
+git clean -f
+
+Useful after builds create temporary files.
+
+13. git remote
+
+View remotes:
+
+git remote -v
+
+Example:
+
+origin
+https://github.com/company/project.git
+
+Add remote:
+
+git remote add origin <repo-url>
+
+Remove:
+
+git remote remove origin
+14. git fetch
+
+Downloads remote changes.
+
+git fetch
+
+Updates remote-tracking branches only.
+
+No merge.
+
+15. git pull
+git pull
+
+Equivalent to:
+
+git fetch
+git merge
+
+Downloads and integrates remote changes.
+
+16. git push
+
+Uploads commits.
+
+git push origin main
+
+First push:
+
+git push -u origin main
+
+The -u option sets the upstream branch.
+
+Real Enterprise Example
+
+A developer workflow:
+
+Morning
+   │
+git pull
+   │
+Write Code
+   │
+git status
+   │
+git add
+   │
+git diff --staged
+   │
+git commit
+   │
+git push
+   │
+GitHub Actions
+Hands-on Lab 1
+
+Create a repository:
+
+mkdir git-commands
+cd git-commands
+git init
+Hands-on Lab 2
+
+Create a file:
+
+echo "Azure DevOps" > README.md
+
+Check:
+
+git status
+Hands-on Lab 3
+
+Stage:
+
+git add README.md
+
+Commit:
+
+git commit -m "Initial Commit"
+
+View:
+
+git log --oneline
+Hands-on Lab 4
+
+Modify:
+
+Azure DevOps
+
+Git Commands
+
+Run:
+
+git diff
+
+Then:
+
+git add .
+git diff --staged
+
+Commit:
+
+git commit -m "Updated README"
+Hands-on Lab 5
+
+Rename:
+
+git mv README.md documentation.md
+
+Commit:
+
+git commit -m "Renamed README"
+Hands-on Lab 6
+
+Create:
+
+touch temp.txt
+
+Preview cleanup:
+
+git clean -n
+
+Delete:
+
+git clean -f
+Hands-on Lab 7
+
+Connect GitHub:
+
+git remote add origin <repo-url>
+git push -u origin main
+Enterprise Scenario
+
+Your pipeline fails because someone committed:
+
+terraform.tfvars
+
+containing secrets.
+
+Fix:
+
+git rm --cached terraform.tfvars
+
+Add to .gitignore:
+
+terraform.tfvars
+
+Commit:
+
+git commit -m "Remove sensitive file from tracking"
+
+Rotate the exposed secrets immediately because they may already have been compromised.
+
+Command Summary
+Command	Purpose
+git init	Create repository
+git clone	Copy repository
+git status	Check repository state
+git add	Stage changes
+git commit	Save snapshot
+git log	View history
+git show	Inspect commit
+git diff	Compare changes
+git rm	Remove tracked file
+git mv	Rename file
+git restore	Restore file
+git clean	Remove untracked files
+git remote	Manage remotes
+git fetch	Download changes
+git pull	Download and merge
+git push	Upload commits
+Interview Questions
+1. What is the difference between git add and git commit?
+git add stages changes.
+git commit records the staged changes in the local repository.
+2. What is the difference between git diff and git diff --staged?
+git diff shows unstaged changes.
+git diff --staged shows staged changes that will be committed.
+3. What does git clean do?
+
+It removes untracked files from the working directory. Use git clean -n first to preview what will be deleted.
+
+4. When would you use git restore?
+
+To discard local uncommitted changes or to unstage files using git restore --staged.
+
+5. What is the safest way to check the current repository status?
+git status
+Assignment
+
+Practice these commands:
+
+git init
+git status
+git add .
+git commit -m "First Commit"
+git log --oneline
+git show
+git diff
+git restore
+git rm
+git mv
+git clean -n
+git clean -f
+git remote -v
+git push
+git fetch
+git pull
+Key Takeaways
+git status is your daily health check.
+Always review changes with git diff before committing.
+Use clear, meaningful commit messages.
+Preview git clean before deleting files.
+git fetch is safer than git pull when you want to inspect incoming changes first.
+🧪 Enterprise Lab (Recommended)
+
+Create a small repository with this structure:
+
+azure-devops-demo/
+├── app.py
+├── Dockerfile
+├── README.md
+├── .gitignore
+└── terraform/
+    └── main.tf
+
+Then:
+
+Initialize Git.
+Commit the initial project.
+Modify app.py.
+Stage only app.py.
+Review with git diff --staged.
+Commit.
+Rename README.md.
+Push everything to GitHub.
+
+This mirrors the workflow you'll use in real DevOps projects.
