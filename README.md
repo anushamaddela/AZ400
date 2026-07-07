@@ -83,8 +83,6 @@ Log Analytics
 Application Insights
 Alerts
 Hands-on
-Chapter 10
-Mini Enterprise Azure Project
 
 🎉 Module 2 Completed!
 

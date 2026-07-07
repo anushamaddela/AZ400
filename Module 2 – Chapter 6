@@ -104,6 +104,7 @@ File	Tier
 Website images	Hot
 Monthly reports	Cool
 5-year-old backups	Archive
+
 Hands-on Lab 1
 
 Create a Storage Account.
@@ -128,6 +129,7 @@ az storage account create \
   --resource-group rg-az400-dev \
   --location centralindia \
   --sku Standard_LRS
+  
 Hands-on Lab 2
 
 Create a Blob Container.
@@ -147,7 +149,8 @@ terraform-state
 Upload:
 
 terraform.tfstate
-Azure Files
+
+2.Azure Files
 
 Azure Files provides SMB/NFS file shares.
 
@@ -176,7 +179,7 @@ fileshare-dev
 
 Mount it on a Windows or Linux VM later in the course.
 
-Queue Storage
+3.Queue Storage
 
 Queue Storage stores messages between applications.
 
@@ -205,7 +208,7 @@ Background Worker
 
 This improves scalability and reliability.
 
-Table Storage
+4.Table Storage
 
 Stores NoSQL key-value data.
 
@@ -217,7 +220,7 @@ Department
 
 Suitable for simple structured data.
 
-Managed Disks
+Managed Disks:
 
 Managed Disks are storage volumes attached to Azure Virtual Machines.
 
@@ -234,6 +237,7 @@ Standard SSD	Development
 Premium SSD	Production
 Premium SSD v2	High-performance databases
 Ultra Disk	Very high IOPS workloads
+
 Hands-on Lab 4
 
 Create a VM.
@@ -244,7 +248,7 @@ OS Disk
 
 Azure automatically creates a Managed Disk.
 
-Storage Redundancy
+Storage Redundancy:
 
 Azure automatically replicates your data.
 

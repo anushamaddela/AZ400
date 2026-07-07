@@ -167,6 +167,7 @@ az network vnet subnet update \
   --vnet-name vnet-az400-dev \
   --name web-subnet \
   --nat-gateway nat-dev
+
 3. Azure Load Balancer
 What is a Load Balancer?
 
@@ -291,7 +292,8 @@ Azure Firewall
       │
       ▼
 Virtual Network
-Features
+
+Features:
 Network Rules
 Application Rules
 FQDN Filtering
@@ -299,7 +301,8 @@ Threat Intelligence
 Logging
 DNAT/SNAT
 High Availability
-NSG vs Azure Firewall
+
+NSG vs Azure Firewall:
 NSG	Azure Firewall
 Subnet/NIC level	Network-wide
 Layer 3 & 4	Layer 3–7 capabilities
